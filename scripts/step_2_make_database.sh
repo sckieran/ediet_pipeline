@@ -50,3 +50,4 @@ do
         mv *_${p}_sequences.fasta ./${p}
 done < list_of_genes.txt
 
+#put in if loop if no extra seqs#
