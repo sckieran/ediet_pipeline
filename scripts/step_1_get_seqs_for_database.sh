@@ -45,12 +45,10 @@ mkdir -p $db_dirr
 cp $taxlist ./${db_dirr}
 cp $genelist ./${db_dirr}
 
-#module load R/4.2.3
-#module load ncbi-blast
+
 #run rentrez#
 
-eval "$(conda shell.bash hook)"
-conda activate $env_name
+source activate $env_name
 python -u ${dirr}/scripts/query_rentrez.py $prefix ${PWD}/${db_dirr} $genelist $taxlist $retmax $genus_search $key $email
 
 exit_status=$?
