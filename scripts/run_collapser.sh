@@ -2,7 +2,9 @@
 #SBATCH -e fx_col.%j.err
 #SBATCH -o fx_col.%j.out
 
-module load fastx
+env_name=$3
+
+source activate 
 
 infil=$1
 dir=$2
