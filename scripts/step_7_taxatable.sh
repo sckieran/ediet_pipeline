@@ -8,7 +8,7 @@ user=$5
 
 cd ${dirr}/${gene}_out
 
-at ${dirr}/scripts/slurm_template.txt ${dirr}/scripts/run_ttb.sh > ${dirr}/scripts/run_ttb_full.sh
+cat ${dirr}/scripts/slurm_template.txt ${dirr}/scripts/run_ttb.sh > ${dirr}/scripts/run_ttb_full.sh
 cat ${dirr}/scripts/slurm_template.txt ${dirr}/scripts/run_ttb_comp.sh > ${dirr}/scripts/run_ttb_comp_full.sh
 
 
