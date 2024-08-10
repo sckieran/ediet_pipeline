@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts ":n:g:d:m:r:b:c:t:j:u:" opt; do
+while getopts ":n:g:d:m:r:b:c:t:j:u:e:" opt; do
   case $opt in
     n) prefix="$OPTARG"
     ;;
@@ -22,6 +22,8 @@ while getopts ":n:g:d:m:r:b:c:t:j:u:" opt; do
     ;;
     u) user="$OPTARG"
     ;;
+    e) env_name="$OPTARG"
+    ;;
     \?) echo "Invalid option -$OPTARG" >&2
     exit 1
     ;;
@@ -29,8 +31,10 @@ while getopts ":n:g:d:m:r:b:c:t:j:u:" opt; do
 done
 
 
-module load ncbi-blast/2.10.1
+source activate ${env_name}
 
+cat ${dirr}/scripts/slurm_template.txt ${dirr}/scripts/run_tax.sh > ${dirr}/scripts/run_tax_full.sh
+cat ${dirr}/scripts/slurm_template.txt ${dirr}/scripts/run_tax_remote.sh > ${dirr}/scripts/run_tax_remote_full.sh
 
 cd ${dirr}
 
@@ -187,7 +191,7 @@ do
      			if [[ ! -s ${prefix}_${gene}_best_blast_hits.out_${x} ]];
 	 		then
 	 			echo "outfile for $fil does not yet exist or is empty. Doing $fil."
-     				res=$(sbatch ${dirr}/scripts/run_tax.sh $x $prefix $gene $tot_per_file $blastout $ncbi $dirr)
+     				res=$(sbatch ${dirr}/scripts/_full.sh $x $prefix $gene $tot_per_file $blastout $ncbi $dirr)
    				if squeue -u $user | grep -q "${res##* }"; 
    				then
    					echo "job ${res##* } for $fil submitted successfully."
