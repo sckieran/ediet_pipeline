@@ -1,0 +1,6 @@
+#!/bin/bash
+
+#SBATCH --partition= ##enter the name of your desired partition. This will the partition for all jobs you submit. Delete this line if your HPC doesn't use partitions.
+#SBATCH --time=2-12:00:00
+#SBATCH --mail-type=ALL ##enter your preferences for getting SLURM emails here, or delete this line if you don't want emails about your slurm jobs
+#SBATCH --mail-user=  ##enter your email here, or delete this line if you don't want emails about slurm jobs.
