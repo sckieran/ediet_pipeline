@@ -1,9 +1,3 @@
-#!/bin/bash
-
-#SBATCH -J mksq
-#SBATCH -e mksq.%j.out
-#SBATCH -o mksq.%j.err
-#SBATCH -C "ceph"
 
 inp=$1
 dir=$2
