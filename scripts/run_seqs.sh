@@ -7,9 +7,8 @@ minlen=$5
 env_name=$6
 
 cd ${dir}/${gene}
-eval "$(conda shell.bash hook)"
-conda activate $env_name
-pref=$CONDA_PREFIX
+source activate $env_name
+
 
 while read fil;
 do
