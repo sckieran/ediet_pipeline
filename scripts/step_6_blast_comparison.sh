@@ -31,7 +31,10 @@ while getopts ":n:g:d:m:r:b:c:t:j:u:e:" opt; do
 done
 
 
-module load ncbi-blast/2.10.1
+source_activate $env_name
+
+cat ${dirr}/scripts/slurm_template.txt ${dirr}/scripts/run_tax.sh > ${dirr}/scripts/run_tax_full.sh
+cat ${dirr}/scripts/slurm_template.txt ${dirr}/scripts/run_tax_remote.sh > ${dirr}/scripts/run_tax_remote_full.sh
 
 max_jobs=$(( $max_jobs / 2 )) #because we submit two jobs per set of samples, one local and one remote, we reduce the max_jobs by half so we don't go over the max. This is imperfect because of floating point, will fix later.
 
@@ -233,10 +236,10 @@ do
      			if [[ ! -s ${prefix}_${gene}_best_blast_hits.out_${x} ]]; ##check if local outfile exists, or submit##
 	 		then
 	 			echo "outfile for $fil does not yet exist or is empty. Doing $fil."
-     				res=$(sbatch ${dirr}/scripts/run_tax.sh $x $prefix $gene $tot_per_file $blastout $ncbi $dirr $remote_blastout)
+     				res=$(sbatch ${dirr}/scripts/run_tax_full.sh $x $prefix $gene $tot_per_file $blastout $ncbi $dirr $remote_blastout)
    				if [[ ! -s remote_${prefix}_${gene}_best_blast_hits.out_${x} ]];
        				then
-       					sbatch ${dirr}/scripts/run_tax_remote.sh $x $prefix $gene $tot_per_file $remote_blastout $ncbi $dirr
+       					sbatch ${dirr}/scripts/run_tax_remote_full.sh $x $prefix $gene $tot_per_file $remote_blastout $ncbi $dirr
        				fi
 	   			if squeue -u $user | grep -q "${res##* }"; 
    				then
@@ -251,7 +254,7 @@ do
 				fi
      			elif [[ ! -s remote_${prefix}_${gene}_best_blast_hits.out_${x} ]]; ##if local exists, double check that remote outfile ALSO exists, or submit##
 			then
-   				sbatch ${dirr}/scripts/run_tax_remote.sh $x $prefix $gene $tot_per_file $blastout $ncbi $dirr
+   				sbatch ${dirr}/scripts/run_tax_remote_full.sh $x $prefix $gene $tot_per_file $remote_blastout $ncbi $dirr
        				break
 			else
 	 			echo "all samples from $fil already done."
