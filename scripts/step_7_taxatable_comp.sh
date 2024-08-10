@@ -8,6 +8,9 @@ user=$5
 
 cd ${dirr}/${gene}_out
 
+cat ${dirr}/scripts/slurm_template.txt ${dirr}/scripts/run_ttb.sh > ${dirr}/scripts/run_ttb_full.sh
+cat ${dirr}/scripts/slurm_template.txt ${dirr}/scripts/run_ttb_comp.sh > ${dirr}/scripts/run_ttb_comp_full.sh
+
 echo "sample	sequence	reads	identity	taxa	taxid	phylum	class	order	family	genus	bitscore	tax_num	all_species_in_best_hit	remote_identity	remote_taxa	remote_taxid	remote_phylum	remote_class	remote_order	remote_family	remote_genus	remote_bitscore	remote_tax_num	remote_all_species_in_best_hit" >  ${prefix}_${gene}_ttb_header
 ls *_seqs.txt > samplist
 num_seqs=$( wc -l samplist | awk '{print $1}')
@@ -45,7 +48,7 @@ do
      			while true;
      			do
      				echo "outfile for $fil does not yet exist or is empty. Doing $fil."
-     				res=$(sbatch ${dirr}/scripts/run_ttb_comp.sh $fil $dirr $gene $prefix)
+     				res=$(sbatch ${dirr}/scripts/run_ttb_comp_full.sh $fil $dirr $gene $prefix)
    				if squeue -u $user | grep -q "${res##* }"; 
    				then
    					echo "job ${res##* } for $fil submitted successfully."
@@ -76,7 +79,7 @@ do
   				lensl=$( wc -l temp_samplist_${y} | awk '{print $1}' )
       				echo "There is an outfile for samplist_${y}, but it is incomplete. There are ${lensl} samples to integrate."
       				mv temp_samplist_${y} samplist_${y}
-      				res=$(sbatch ${dirr}/scripts/run_ttb.sh samplist_${y} $dirr $gene $prefix)
+      				res=$(sbatch ${dirr}/scripts/run_ttb_full.sh samplist_${y} $dirr $gene $prefix)
    				while true;
        				do
 	       				if squeue -u $user | grep -q "${res##* }"; 
