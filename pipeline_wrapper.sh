@@ -36,6 +36,8 @@ echo "###"
 echo "now doing step one - downloading sequences for your local reference database."
 echo "###"
 
+##make taxalists for each gene##
+
 bash ${dir}/scripts/step_1_get_seqs_for_database.sh -n ${prefix} -t ${taxlist} -g ${genelist} -d ${dir} -r ${retmax} -h ${db_dirr} -s ${genus_search} -p ${env_name} -k ${key} -e ${email} 
 exit_status=$?
 if [ "${exit_status}" -ne 0 ];
