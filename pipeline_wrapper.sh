@@ -1,9 +1,11 @@
 #!/bin/bash
-
+#SBATCH -p #your partition
+#SBATCH -t 3-12:00:00 #your time limit
 #SBATCH -J metab_pipe
 #SBATCH -o metab_pipe.%j.out
 #SBATCH -e metab_pipe.%j.err
 #SBATCH --mem=14G
+##IMPORTANT: ADD ANY OTHER SLURM COMMANDS YOU NEED HERE##
 
 dir=$PWD ##you can leave this as $PWD if you will run your pipeline_wrapper.sh script from a containing folder that contains directories for each gene containing your sequence fastq files, a directory containing all the scripts from github for the pipeline, and your taxalists and genelist. That is all you need in the folder. Otherwise, give the absolute path for that directory.
 prefix=your_project #name of your project, all outfiles will start with this name. NO SPECIAL CHARACTERS ALLOWED, including "#$!*&()@^". NO SPACES ALLOWED
@@ -19,7 +21,7 @@ R2_pattern="_R2.fastq"  #pattern that ends your reverse reads. This should be co
 max_jobs=10  #max number of jobs you want to submit to the cluster at one time. Unless you are comfortable with your job limits, I recomment this number is <=10.
 extra_seqs="extra_seqs" #extra sequences that wouldn't be found in a genbank search that you want to add to your local database. name should be "extra_seqs_[gene]_sequences.fasta"
 filter=FALSE #do you want to filter your data by taxa after taxatables are built? See walkthrough for help.
-asv_rra=0.005 #do you want to pre-filter your data by ASV relative read abundance? Required for comparing local and remote results. If you don't want to pre-filter, set this value to 0.
+asv_rra=0 #do you want to pre-filter your data by ASV relative read abundance? Required for comparing local and remote results. If you don't want to pre-filter, set this value to 0.
 taxa_rra=0.005 #RRA value to filter taxa by if you set filter=TRUE
 identity_cutoff=97  #percent identity cutoff for taxa RRA filtering or returning BLAST hits. Use the literature for your gene/primer set to figure this out, 97-99 is common.
 minlen=70 #set a minimum length for ASVs, base this value on the length of your amplicon after trimming. 
@@ -109,7 +111,7 @@ do
   if [[ $remote == "TRUE" ]]
   then
     echo "building input FASTA and performing remote BLAST."
-    bash ${dir}/scripts/step_6_blast_remote.sh -n ${prefix} -g ${gene} -d ${dir} -m ${minlen} -c ${identity_cutoff} -t ${return_low} -j ${max_jobs} -u ${user}
+    bash ${dir}/scripts/step_6_blast_remote.sh -n ${prefix} -g ${gene} -d ${dir} -m ${minlen} -c ${identity_cutoff} -t ${return_low} -j ${max_jobs} -u ${user} -e ${env_name}
     exit_status=$?
     if [ "${exit_status}" -ne 0 ];
     then
@@ -148,7 +150,7 @@ elif [[ $remote_comp == "TRUE" ]]
     fi
   else
     echo "building input FASTA and performing local BLAST."
-    bash ${dir}/scripts/step_6_blast.sh -n ${prefix} -g ${gene} -d ${dir} -m ${minlen} -r ${db_dirr} -c ${identity_cutoff} -t ${return_low} -j ${max_jobs} -u ${user}
+    bash ${dir}/scripts/step_6_blast.sh -n ${prefix} -g ${gene} -d ${dir} -m ${minlen} -r ${db_dirr} -c ${identity_cutoff} -t ${return_low} -j ${max_jobs} -u ${user} -e ${env_name}
     exit_status=$?
     if [ "${exit_status}" -ne 0 ];
     then
