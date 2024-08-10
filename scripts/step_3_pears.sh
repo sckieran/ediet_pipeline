@@ -9,7 +9,9 @@ gene=$6
 
 cd ${dir}/${gene}
 
+cat ${dir}/scripts/slurm_template.txt ${dir}/scripts/pear.sh > ${dir}/scripts/pear_full.sh
 
+ 
 ls *${pattern} > seqlist
 num_seqs=$( cat seqlist | wc -l | awk '{print $1}')
 tot_per_file=$( awk -v a1=$num_seqs -v a2=$max_jobs 'BEGIN { x+=(a1/a2); printf("%.0f", (x == int(x)) ? x : int(x)+1) }' )
@@ -57,7 +59,7 @@ do
       while true;
      			do
      				echo "outfile for $fil does not yet exist or is empty. Doing $fil."
-     				res=$(sbatch ${dir}/scripts/pear.sh $fil $pattern $r2_pattern ${dir}/${gene})
+     				res=$(sbatch ${dir}/scripts/pear_full.sh $fil $pattern $r2_pattern ${dir}/${gene})
    			  	if squeue -u $user | grep -q "${res##* }"; 
    	  			then
      					echo "job ${res##* } for $fil submitted successfully."
