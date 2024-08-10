@@ -8,6 +8,8 @@ user=$5
 minlen=$6
 env_name=$7
 
+cat ${dir}/scripts/slurm_template.txt ${dir}/scripts/run_seqs.sh > ${dir}/scripts/run_seqs_full.sh
+
 cd ${dir}/${gene}
 mkdir -p ./unfiltered_seqfiles
 
@@ -52,7 +54,7 @@ do
       while true;
      	do
      		echo "outfile for $fil does not yet exist or is empty. Doing $fil."
-     		res=$(sbatch ${dir}/scripts/run_seqs.sh $fil ${dir} ${gene} ${cutoff} ${minlen} ${env_name})
+     		res=$(sbatch ${dir}/scripts/run_seqs_full.sh $fil ${dir} ${gene} ${cutoff} ${minlen} ${env_name})
    		if squeue -u $user | grep -q "${res##* }"; 
    		then
    		  echo "job ${res##* } for $fil submitted successfully."
