@@ -31,8 +31,11 @@ return_low=TRUE #do you want BLAST to return hits below your identity% threshold
 user=your_slurm_username #required. Usually the same as your cluster username.
 email=your_ncbi_email_address #technically optional, but NCBI throws warnings if you don't include an email address##
 
+conda_source=$(conda info | grep -i 'base environment' | awk -F":" '{print $2}'| awk -F" " '{print $1}')
 
-source activate ${env_name}
+source ${conda_source}/etc/profile.d/conda.sh
+conda activate ${env_name}
+#source activate ${env_name}
 
 echo "###"
 echo "###"
