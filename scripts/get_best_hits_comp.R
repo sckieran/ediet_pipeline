@@ -5,10 +5,10 @@ library("tidyverse",lib=args[3])
 
 setwd(args[4])
 
-rbo <- read.delim(paste0(args[4],args[1],"_",args[2],"_raw_blast_out"), header=FALSE)
-rrbo <- read.delim(paste0(args[4],args[1],"_",args[2],"_remote_raw_blast_out"), header=FALSE)
+rbo <- read.delim(paste0(args[4],"/",args[1],"_",args[2],"_raw_blast_out"), header=FALSE)
+rrbo <- read.delim(paste0(args[4],"/",args[1],"_",args[2],"_remote_raw_blast_out"), header=FALSE)
 
-ncbi <- read.csv(paste0(args[4],args[5]))
+ncbi <- read.csv(paste0(args[4],"/",args[5]))
 
 colnames(rbo) <- c("seqnum","accession","identity","length","taxon_info","bitscore")
 colnames(rrbo) <- c("seqnum","accession","identity_remote","length","taxon_remote","bitscore_remote","tax_id")
