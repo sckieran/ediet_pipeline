@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts ":n:g:d:m:r:b:c:t:e:" opt; do
+while getopts ":n:g:d:m:r:c:t:e:" opt; do
   case $opt in
     n) prefix="$OPTARG"
     ;;
@@ -11,8 +11,6 @@ while getopts ":n:g:d:m:r:b:c:t:e:" opt; do
     m) minlen="$OPTARG"
     ;;
     r) db_dirr="$OPTARG"
-    ;;
-    b) localdat="$OPTARG"
     ;;
     c) cutoff="$OPTARG"
     ;;
@@ -35,10 +33,8 @@ pref=$CONDA_PREFIX
 
 cd ${dirr}
 
-if [[ -z ${localdat} ]]
-then
-	localdat=${prefix}_${gene}_reference
-fi
+localdat=${prefix}_${gene}_reference
+
 
 mkdir -p ${gene}_out
 
