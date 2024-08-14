@@ -3,7 +3,7 @@ args = commandArgs(trailingOnly=TRUE)
 #args list: 1) prefix, 2) gene, 3) rlib location, 4) project dirr, 5) name of NCBI tax file
 library("tidyverse",lib=args[3])
 
-setwd(args[1])
+setwd(args[4])
 
 rbo <- read.delim(paste0(args[4],args[1],"_",args[2],"_raw_blast_out"), header=FALSE)
 
