@@ -9,7 +9,13 @@ r2_pattern=$3
 dir=$4
 
 cd ${dir}
-module load pear
+##load conda
+conda_source=$(conda info | grep -i 'base environment' | awk -F":" '{print $2}'| awk -F" " '{print $1}')
+source ${conda_source}/etc/profile.d/conda.sh
+conda activate ${env_name}
+#source activate ${env_name}
+
+
 while read fil;
 do
   base=$(echo $fil | awk -F"$pattern" '{print $1}')
