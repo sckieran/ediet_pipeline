@@ -2,9 +2,11 @@
 #SBATCH -e fx_col.%j.err
 #SBATCH -o fx_col.%j.out
 
-env_name=$3
-
-source activate 
+##load conda
+conda_source=$(conda info | grep -i 'base environment' | awk -F":" '{print $2}'| awk -F" " '{print $1}')
+source ${conda_source}/etc/profile.d/conda.sh
+conda activate ${env_name}
+#source activate ${env_name}
 
 infil=$1
 dir=$2
