@@ -26,7 +26,11 @@ while getopts ":n:g:d:m:r:b:c:t:e:" opt; do
     esac
 done
 
-source activate ${env_name}
+##load conda
+conda_source=$(conda info | grep -i 'base environment' | awk -F":" '{print $2}'| awk -F" " '{print $1}')
+source ${conda_source}/etc/profile.d/conda.sh
+conda activate ${env_name}
+#source activate ${env_name}
 pref=$CONDA_PREFIX
 
 cd ${dirr}
