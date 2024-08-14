@@ -3,12 +3,12 @@ args = commandArgs(trailingOnly=TRUE)
 #args list: 1) prefix, 2) gene, 3) rlib location, 4) project dirr, 5) name of NCBI tax file
 library("tidyverse",lib=args[3])
 
-setwd(args[1])
+setwd(args[4])
 
 
-rrbo <- read.delim(paste0(args[4],args[1],"_",args[2],"_remote_raw_blast_out"), header=FALSE)
+rrbo <- read.delim(paste0(args[4],"/",args[1],"_",args[2],"_remote_raw_blast_out"), header=FALSE)
 
-ncbi <- read.csv(paste0(args[4],args[5]))
+ncbi <- read.csv(paste0(args[4],"/'<args[5]))
 
 
 colnames(rrbo) <- c("seqnum","accession","identity","length","taxon","bitscore_remote","tax_id")
