@@ -48,22 +48,22 @@ This pipeline assumes reasonably good resolution of locus data and is designed a
 4. make a project directory (`mkdir your_project`) and add folders that contain your trimmed sequence files for each gene or primer set (ie ITS, 12S, trnL)
 5. cd into your project directory (`cd ./your_project`) and do all of steps 5-9 from that directory.
 6. set up the scripts and conda environment by typing the following:
-   `module load git`
+   `module load git` #or ask your administrator about how to clone a git repository on your cluster, you may need to install git
    
-   `git clone https://github.com/sckieran/Metabarcoding_Pipeline_Waits/`
+   `git clone https://github.com/sckieran/ediet_pipeline/`
    
-   `cp -r ./Metabarcoding_Pipeline_Waits/scripts/ .` #to get the scripts into your project directory
+   `cp -r ./ediet_pipeline/scripts/ .` #to get the scripts into your project directory
 
-   `cp ./Metabarcoding_Pipeline_Waits/pipeline_wrapper.sh .` #to get the wrapper into your project directory
+   `cp ./ediet_pipeline/pipeline_wrapper.sh .` #to get the wrapper into your project directory
 
-    `cp ./Metabarcoding_Pipeline_Waits/slurm_template.txt .` #to move the slurm template into your project directory
+    `cp ./ediet_pipeline/slurm_template.txt .` #to move the slurm template into your project directory
    
 8. add a taxa list for each gene to your project directory. They should be identically named except for the gene name (taxlist_12S, taxlist_ITS, taxlist_fwh1). They can be identical, but don't have to be. Each entry in the taxa list must contain two words, genus and species, separated by a space. If you want to search a whole genus, put "genus sp." Do not include a header line.
 9. Add a list of gene terms to search for each gene/primer set. Scan NCBI for common variation on gene names. Each gene should be its own column. Columns do not have to be the same length. Each column should have a short header with no special characters or spaces, ie 12S/ITS. That header will not automatically be considered a search term, so add it to the column itself if you want it to be included. See example genelist.
 10. Set your parameters by editing the pipeline_wrapper.sh script using a text editor like nano, vim or emacs (see "Parameter Setting" in this tutorial)
 11. Set your slurm template by editing the slurm_template.txt file to correspond to your cluster. Internal slurm will have their own err/outfiles and jobnames, so don't add those. But do add anything your cluster needs you to submit - often a partition name, sometimes minimums for node requests, etc. No need to add tons of memory to the jobs.
-13. cd into your project directory
-14. Run the program: `sbatch pipeline_wrapper.sh`
+13. If you wish, copy the ncbi_lineages_2024-01-23.csv.gz from ./ediet_pipeline/ to you project directory. This will use this static version of the NCBI lineages from January 2024. I will periodically update this static file, but if you're working on organisms that may have been added to NCBI very recently, you may want to skip this step and download a new version using ncbitax2lin.
+15. From your project directory, run the program: `sbatch pipeline_wrapper.sh`
     
 ## Parameter Setting
 This pipeline contains a wrapper script with all the parameters you'll need to set to run it successfully. Here is a breakdown of those parameters:
