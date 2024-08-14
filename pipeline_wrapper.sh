@@ -31,6 +31,9 @@ return_low=TRUE #do you want BLAST to return hits below your identity% threshold
 user=your_slurm_username #required. Usually the same as your cluster username.
 email=your_ncbi_email_address #technically optional, but NCBI throws warnings if you don't include an email address##
 
+
+source activate ${env_name}
+
 echo "###"
 echo "###"
 echo "now doing step one - downloading sequences for your local reference database."
