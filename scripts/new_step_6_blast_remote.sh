@@ -43,6 +43,7 @@ cat *_seqs.txt | cut -f1 | sort | uniq | awk -v m=$minlen '{ if (length($0) > m)
 sed -i '/^$/d' temp_seqs
 
 	##make query fasta from seqlist#
+echo "making query fasta from your ASVs"
 x=1
 n=$(wc -l temp_seqs | awk '{print $1}')
 touch ${prefix}_${gene}_headers
@@ -76,7 +77,7 @@ do
 done
 paste -d '\n' ${prefix}_${gene}_headers temp_seqs > ${prefix}_${gene}_combined_ASVs.fasta
 rm temp_seqs ${prefix}_${gene}_headers
-
+echo "done making query fasta. Looking for NCBI taxonomy file."
 cd ${dirr}
 if ls ncbi*.csv* 1> /dev/null 2>&1; then
 	echo "ncbi tax file found, beginning tax assessment"
@@ -121,7 +122,7 @@ nohits=$( wc -l remote_list_of_no_hits | awk '{print $1}')
 echo "there were ${totalhits} raw BLAST hits out of ${totalseqs} unique sequences, and ${nohits} remote BLAST no-hits. If this number seems too high, consider altering your filtering parameters, changing the blast parameters or adding taxa to your reference database."
 cp out1 temp_seqlist
 rm out1 out2
-
+echo "done with blast. Now assigning taxonomy."
 
 if [[ ${totalhits} -eq 0 ]]
 then
