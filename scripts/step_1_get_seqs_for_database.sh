@@ -47,8 +47,12 @@ cp $genelist ./${db_dirr}
 
 
 #run rentrez#
+conda_source=$(conda info | grep -i 'base environment' | awk -F":" '{print $2}'| awk -F" " '{print $1}')
 
-source activate $env_name
+source ${conda_source}/etc/profile.d/conda.sh
+conda activate ${env_name}
+#source activate ${env_name}
+
 python -u ${dirr}/scripts/query_rentrez.py $prefix ${PWD}/${db_dirr} $genelist $taxlist $retmax $genus_search $key $email
 
 exit_status=$?
