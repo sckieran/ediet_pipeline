@@ -17,7 +17,7 @@ rrbo$tax_id <- as.integer(rrbo$tax_id)
 
 t3 <- left_join(rbo,ncbi,by="tax_id")
 t3 <- t3[,1:14]
-t4 <- t3 %>% group_by(seqnum) %>% summarise(identity=mean(identity),"bitscore"=mean(bitscore),length=mean(length),n_species=n_distinct(species), species=paste(unique(species), collapse=','),n_genus=n_distinct(genus),genus=paste(unique(genus), collapse=','),n_family=n_distinct(family),family=paste(unique(family), collapse=','), n_order=n_distinct(order), order=paste(unique(order), collapse=',') ,n_class=n_distinct(class),class=paste(unique(class), collapse=','),n_phylum=n_distinct(phylum),phylum=paste(unique(phylum), collapse=','))
+t4 <- t3 %>% group_by(seqnum) %>% filter(bitscore==max(bitscore)) %>% summarise(identity=mean(identity),"bitscore"=mean(bitscore),length=mean(length),n_species=n_distinct(species), species=paste(unique(species), collapse=','),n_genus=n_distinct(genus),genus=paste(unique(genus), collapse=','),n_family=n_distinct(family),family=paste(unique(family), collapse=','), n_order=n_distinct(order), order=paste(unique(order), collapse=',') ,n_class=n_distinct(class),class=paste(unique(class), collapse=','),n_phylum=n_distinct(phylum),phylum=paste(unique(phylum), collapse=','))
 t4$resolution <- ifelse(!rowSums(t4 == 1), names(t4)[ncol(t4)], names(t4)[max.col(t4 == 1, 'first')])
 t4$resolution <- gsub("n_","",t4$resolution)
 
@@ -42,7 +42,7 @@ rm(list = ls(pattern = "_df$"))
 
 t3_r <- left_join(rrbo,ncbi,by="tax_id")
 t3_r <- t3_r[,1:14]
-t4_r <- t3_r %>% group_by(seqnum) %>% summarise(identity=mean(identity_remote),"bitscore"=mean(bitscore_remote),length=mean(length),n_species=n_distinct(species), species=paste(unique(species), collapse=','),n_genus=n_distinct(genus),genus=paste(unique(genus), collapse=','),n_family=n_distinct(family),family=paste(unique(family), collapse=','), n_order=n_distinct(order), order=paste(unique(order), collapse=',') ,n_class=n_distinct(class),class=paste(unique(class), collapse=','),n_phylum=n_distinct(phylum),phylum=paste(unique(phylum), collapse=','))
+t4_r <- t3_r %>% group_by(seqnum) %>% filter(bitscore_remote==max(bitscore_remote)) %>% summarise(identity=mean(identity_remote),"bitscore"=mean(bitscore_remote),length=mean(length),n_species=n_distinct(species), species=paste(unique(species), collapse=','),n_genus=n_distinct(genus),genus=paste(unique(genus), collapse=','),n_family=n_distinct(family),family=paste(unique(family), collapse=','), n_order=n_distinct(order), order=paste(unique(order), collapse=',') ,n_class=n_distinct(class),class=paste(unique(class), collapse=','),n_phylum=n_distinct(phylum),phylum=paste(unique(phylum), collapse=','))
 t4_r$resolution <- ifelse(!rowSums(t4_r == 1), names(t4_r)[ncol(t4_r)], names(t4_r)[max.col(t4_r == 1, 'first')])
 t4_r$resolution <- gsub("n_","",t4_r$resolution)
 
