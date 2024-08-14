@@ -9,7 +9,7 @@ user=$5
 gene=$6
 
 
-cat ${dir}/scripts/slurm_template.txt ${dir}/scripts/run_collapser.sh > ${dir}/scripts/run_collapser_full.sh
+cat ${dir}/slurm_template.txt ${dir}/scripts/run_collapser.sh > ${dir}/scripts/run_collapser_full.sh
 
 cd ${dir}/${gene}
 
