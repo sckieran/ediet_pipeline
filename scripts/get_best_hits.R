@@ -5,9 +5,9 @@ library("tidyverse",lib=args[3])
 
 setwd(args[4])
 
-rbo <- read.delim(paste0(args[4],args[1],"_",args[2],"_raw_blast_out"), header=FALSE)
+rbo <- read.delim(paste0(args[4],"/",args[1],"_",args[2],"_raw_blast_out"), header=FALSE)
 
-ncbi <- read.csv(paste0(args[4],args[5]))
+ncbi <- read.csv(paste0(args[4],"/",args[5]))
 
 colnames(rbo) <- c("seqnum","accession","identity","length","taxon_info","bitscore")
 rbo$tax_id <- as.integer(str_split_fixed(rbo$taxon_info,"taxid=",2)[,2])
