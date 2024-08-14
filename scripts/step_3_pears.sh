@@ -9,7 +9,7 @@ gene=$6
 
 cd ${dir}/${gene}
 
-cat ${dir}/scripts/slurm_template.txt ${dir}/scripts/pear.sh > ${dir}/scripts/pear_full.sh
+cat ${dir}/slurm_template.txt ${dir}/scripts/pear.sh > ${dir}/scripts/pear_full.sh
 
  
 ls *${pattern} > seqlist
