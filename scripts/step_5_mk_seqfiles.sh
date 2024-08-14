@@ -8,7 +8,7 @@ user=$5
 minlen=$6
 env_name=$7
 
-cat ${dir}/scripts/slurm_template.txt ${dir}/scripts/run_seqs.sh > ${dir}/scripts/run_seqs_full.sh
+cat ${dir}/slurm_template.txt ${dir}/scripts/run_seqs.sh > ${dir}/scripts/run_seqs_full.sh
 
 cd ${dir}/${gene}
 mkdir -p ./unfiltered_seqfiles
