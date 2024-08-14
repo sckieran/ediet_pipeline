@@ -1,11 +1,11 @@
-# Waits Lab Metabarcoding Training Pipeline
-Shannon Kieran Blair 2023
+# The eDiet Metabarcoding Pipeline
+Shannon Kieran Blair 2024
 
 ## Overview of Pipeline
 
-A pipeline and tutorial to analyze metabarcoding data using pears and fastx-collapser with a limited local reference database. It is intended to be an analysis guide for students working on their own projects. It currently only runs on the UI RCDS cluster but is designed to run on any SLURM-based cluster. Future branches will generalize the SLURM environmental parameters.
+A pipeline and tutorial to analyze metabarcoding data using pears and fastx-collapser with a limited local reference database. It is intended to be an analysis guide for students working on their own projects. It should run on any SLURM-based linux cluster that supports conda environments. A non-SLURM, bash-only (slower) version is coming.
 
-This pipeline assumes reasonably good resolution of locus data and is designed as a "first pass" at your metabarcoding data, not a finished product. The way this pipeline assesses BLAST hits is both **naive and conservative**. If more than one equally-likely BLAST hit is available (judged by bitscore), it will attempt to assign taxonomy to each hit using the output of ncbitax2lin, then walk up the taxonomy tree until it finds a consensus rank. If no consensus is available at the phylum level, it calls a "no-hit". Therefore **this pipeline only works with reference libraries made using this pipeline, or with remote BLAST.** However, you can use your own FASTAs as input to step 2 of this pipeline if you want to skip querying NCBI, as long as each sequence in that FASTA begins with a header line in the format >accession genus species taxid=[Valid NCBI taxid]. You can input a list of taxa into https://www.ncbi.nlm.nih.gov/Taxonomy/TaxIdentifier/tax_identifier.cgi to get a list of taxids.
+This pipeline assumes reasonably good resolution of locus data and is designed as a "first pass" at your metabarcoding data, not a finished product. The way this pipeline assesses BLAST hits is both **naive and conservative**. If more than one equally-likely BLAST hit is available (judged by bitscore), it will attempt to assign taxonomy to each hit using the NCBI taxonomy tree file, then it will up the taxonomy tree until it finds a consensus rank. If no consensus is available at the phylum level, it calls a "no-hit". Therefore **this pipeline only works with reference libraries made using this pipeline, or with remote BLAST.** However, you can use your own FASTAs as input to step 2 of this pipeline if you want to skip querying NCBI, as long as each sequence in that FASTA begins with a header line in the format >accession genus species taxid=[Valid NCBI taxid]. You can input a list of taxa into https://www.ncbi.nlm.nih.gov/Taxonomy/TaxIdentifier/tax_identifier.cgi to get a list of taxids.
 
 
 ## Glossary of terms
@@ -15,9 +15,8 @@ This pipeline assumes reasonably good resolution of locus data and is designed a
 - _**percent identity**_ An NCBI metric for comparing two sequences. Literally the hamming distance between two sequences, ie, how many changes are required before they are identical.
 - _**bitscore**_ An NCBI metric for assessing how good a BLAST hit is. Roughly, it is the log(2) normalized raw-score. Raw-score is the requred size of a database in order to for a match to occur by chance. 
 
-## Quickstart Guide for RCDS Cluster Users
-1. ssh into the zaphod cluster of RCDS (`ssh your_username@zaphod.hpc.uidaho.edu`)
-2. install miniconda for linux-64 in your home directory (`cd ~`)
+## Quickstart Guide:
+1. If necessary install miniconda for linux-64 in your home directory (`cd ~`)
 
 `mkdir -p ~/miniconda3`
 
@@ -31,7 +30,7 @@ This pipeline assumes reasonably good resolution of locus data and is designed a
 
 `~/miniconda3/bin/conda init zsh`
 
-3. Exit the cluster and log in again. This finalizes the conda install. Next, add conda package channels and install the pipeline dependencies:
+2. Exit the cluster and log in again. This finalizes the conda install. Next, add conda package channels and install the pipeline dependencies:
 
 `conda config --add channels defaults`
 
@@ -41,10 +40,11 @@ This pipeline assumes reasonably good resolution of locus data and is designed a
 
 `conda config --set channel_priority strict`
 
-`conda create -n pipeline pandas biopython r-tidyverse`
+`conda create -n pipeline bioconda::blast bioconda::fastx_toolkit conda-forge::biopython anaconda::pandas bioconda::pear`
 
 `conda activate pipeline` #just to check that it installed correctly
 
+3. If necessary, go to https://account.ncbi.nlm.nih.gov/ and make an account. Then go to Account Settings, scroll down, and generate an NCBI API key. 
 4. make a project directory (`mkdir your_project`) and add folders that contain your trimmed sequence files for each gene or primer set (ie ITS, 12S, trnL)
 5. cd into your project directory (`cd ./your_project`) and do all of steps 5-9 from that directory.
 6. set up the scripts and conda environment by typing the following:
@@ -55,13 +55,15 @@ This pipeline assumes reasonably good resolution of locus data and is designed a
    `cp -r ./Metabarcoding_Pipeline_Waits/scripts/ .` #to get the scripts into your project directory
 
    `cp ./Metabarcoding_Pipeline_Waits/pipeline_wrapper.sh .` #to get the wrapper into your project directory
+
+    `cp ./Metabarcoding_Pipeline_Waits/slurm_template.txt .` #to move the slurm template into your project directory
    
-7. add a taxa list for each gene to your project directory. They should be identically named except for the gene name (taxlist_12S, taxlist_ITS, taxlist_fwh1). They can be identical, but don't have to be. Each entry in the taxa list must contain two words, genus and species, separated by a space. If you want to search a whole genus, put "genus sp." Do not include a header line.
-8. Add a list of gene terms to search for each gene/primer set. Scan NCBI for common variation on gene names. Each gene should be its own column. Columns do not have to be the same length. Each column should have a short header with no special characters or spaces, ie 12S/ITS. That header will not automatically be considered a search term, so add it to the column itself if you want it to be included. See example genelist.
-9. Set your parameters by editing the pipeline_wrapper.sh script using a text editor like nano, vim or emacs (see "Parameter Setting" in this tutorial)
-10. Exit the zaphod cluster and ssh into the fortyfive (SLURM) cluster of RCDS (`ssh your_username@fortyfive.hpc.uidaho.edu`)
-11. cd into your project directory
-12. Run the program: `sbatch pipeline_wrapper.sh`
+8. add a taxa list for each gene to your project directory. They should be identically named except for the gene name (taxlist_12S, taxlist_ITS, taxlist_fwh1). They can be identical, but don't have to be. Each entry in the taxa list must contain two words, genus and species, separated by a space. If you want to search a whole genus, put "genus sp." Do not include a header line.
+9. Add a list of gene terms to search for each gene/primer set. Scan NCBI for common variation on gene names. Each gene should be its own column. Columns do not have to be the same length. Each column should have a short header with no special characters or spaces, ie 12S/ITS. That header will not automatically be considered a search term, so add it to the column itself if you want it to be included. See example genelist.
+10. Set your parameters by editing the pipeline_wrapper.sh script using a text editor like nano, vim or emacs (see "Parameter Setting" in this tutorial)
+11. Set your slurm template by editing the slurm_template.txt file to correspond to your cluster. Internal slurm will have their own err/outfiles and jobnames, so don't add those. But do add anything your cluster needs you to submit - often a partition name, sometimes minimums for node requests, etc. No need to add tons of memory to the jobs.
+13. cd into your project directory
+14. Run the program: `sbatch pipeline_wrapper.sh`
     
 ## Parameter Setting
 This pipeline contains a wrapper script with all the parameters you'll need to set to run it successfully. Here is a breakdown of those parameters:
@@ -129,10 +131,10 @@ This pipeline is for limited-taxa reference databases or remote querying of NCBI
 
 **What if I have a few of my own in-house sequences I want to add to my database?**
 
-That's fine, but it will add some tedious work upfront. First, check if the species you are including have taxids assigned in NCBI. All taxa with at least one sequence in the NCBI nucleotide or sra database have a taxid, and you can look it up here: [here](https://www.ncbi.nlm.nih.gov/Taxonomy/TaxIdentifier/tax_identifier.cgi). Put your homebrewed sequences in a file called extras_gene1_sequences.fasta with the header format ">[any unique non_NCBI accession] genus species taxid=unique_taxid" and put it in your reference_database directory. If your species has a taxid assigned in NCBI, use that as the taxid. Otherwise, you can assign one yourself, I recommend a series of letters and numbers separated by underscores. Do not use a strictly numeric value, you will almost definitely accidentally assign a real taxid to your species.  Next, in your project directory, install and run ncbitax2lin. Then, unzip and modify the ncbitax2lin file. Add the unique_taxids you assigned to the end of the file and add taxonomic information for each species following the comma-separated format of the ncbitax2lin file (described in the header of the file). Then re-zip the ncbitax2lin file and you're readdy go fo. This is tedious to do by hand, so we really recommend submitting your homebrew sequences to NCBI if they're long enough!
+That's fine, but it will add some tedious work upfront. First, check if the species you are including have taxids assigned in NCBI. All taxa with at least one sequence in the NCBI nucleotide or sra database have a taxid, and you can look it up here: [here](https://www.ncbi.nlm.nih.gov/Taxonomy/TaxIdentifier/tax_identifier.cgi). Put your homebrewed sequences in a file called extras_gene1_sequences.fasta with the header format ">[any unique non_NCBI accession] genus species taxid=unique_taxid" and put it in your project directory. If your species has a taxid assigned in NCBI, use that as the taxid. Otherwise, you can assign one yourself, I recommend a series of letters and numbers separated by underscores. Do not use a strictly numeric value, you will almost definitely accidentally assign a real taxid to your species.  Next, in your project directory, install and run ncbitax2lin. Then, unzip and modify the ncbitax2lin file. Add the unique_taxids you assigned to the end of the file and add taxonomic information for each species following the comma-separated format of the ncbitax2lin file (described in the header of the file). Then re-zip the ncbitax2lin file and you're readdy go fo. This is tedious to do by hand, so we really recommend submitting your homebrew sequences to NCBI if they're long enough!
 
 **What if I want to use remote BLAST to query all of NCBI?**
-Select "remote=TRUE" or "remote_comp=TRUE" in the parameters section of the pipeline_wrapper.sh script. But you cannot combine this with an asv_rra=0, because you will end up with many hundreds of thousands of sequences to BLAST, and remote BLAST is very slow and picky. NCBI will be _unhappy_ if you try to remote BLAST more than about 10K ASVs.
+Select "remote=TRUE" or "remote_comp=TRUE" in the parameters section of the pipeline_wrapper.sh script. But you cannot combine this with an asv_rra=0, because you will end up with many hundreds of thousands of sequences to BLAST, and remote BLAST is very slow and picky. NCBI will be _unhappy_ if you try to remote BLAST more than about 10K ASVs. There is nothing I can do to change this. They really just don't want you to ping their servers 500,000 times.
 
 **Why doesn't this pipeline use e-value instead of bitscore or pident?**
 E-values help asses likelihood of homology and are affected by database size. The conserved regions of metabarcoding primers almost guarantee homology above any standard e-value cutoff, and these databases are generally small, so e-values are high across the board.
@@ -238,46 +240,31 @@ Step 5 does the following, in order:
 
 **Scripts**
 
-step_6_blast.sh
-step_6_blast_comparison.sh
-step_6_blast_remote.sh
-run_tax.sh
-run_tax_remote.sh
+new_step_6_blast_local.sh
+new_step_6_blast_comp.sh
+new_step_6_blast_remote.sh
+get_best_hits.R
+get_best_hits_comp.R
+get_best_hits_remote.R
 
 **What This Step Does**
 
 Step 6 does the following, in order:
 1. Copies your per-sample sequence files into a directory called "gene1_out"
 2. Combines the sequences from all samples into one master file, calls uniques and filters out anything <minlen.
-3. Creates a BLAST-formatted fasta from your unique ASV master file. Sequences are given a unique identifier formatted as seq_000001 through seq_999999. File is called your_project_gene1_combined_ASVs.fasta
+3. Creates a BLAST-formatted fasta from your unique ASV master file. Sequences are assigned a unique sequence number formatted as seq_000001 through seq_999999. File is called your_project_gene1_combined_ASVs.fasta
 4. Parses your taxonomy file, or attempts to install and run ncbitax2lin to produce a taxonomy file.
 5. BLASTs your BLAST-formatted query fasta against your reference database. If "return_low" is set to TRUE, returns all the hits with the highest bitscore (no matter how many are equally good), plus the hits from the next two highest bitscores. If return_low is set to FALSE, returns only hits with a percent identity above your identity_cutoff. Runs on 4 threads. If remote_comp is set to TRUE, also runs remote BLAST and assess best hits. If remote is set to TRUE, it will ONLY do remote BLAST.
-6. Parses your raw BLAST results to add convenient taxonomy information (taxid, species) from description of the query sequence.
-7. As in steps 3 and 4, assesses how many jobs to create to assign taxonomy based on your # of sequences and creates jobfiles for each job.
-For each jobfile:
-  8.  Pulls every matching hit from the BLAST output
-  9. Assesses it to determine the highest scoring hit(s) based on bitscore, collects all equally-highly scoring hits.
-  10. Checks how many species are present in the highest scoring hit(s). If it is only one, the program stores the species and taxonomic information for that sequence as the "best hit". If the top BLAST hit(s) include multiple species, the program then fetches the taxonomy tree for each species among the highest scoring hits and walks up the tree, checking at each level (genus, family, class, order, phylum) whether there is taxonomic agreement among the best hits. If no agreement is found at the phylum level, the sequence is recorded as a no-hit. Otherwise, the lowest commonly-shared taxon is reported as the "best hit" for that sequence.
-  11. Returns a "best hit" entry for each sequence that includes the sequence number, the length of the alignment, the percent identity of the top hit, the assigned taxa, the taxonomic information for that hit (phylum, order, class, family, genus), the bitscore of the top hit, the number of species present in the potential best hits, and a comma-separated list of each species that was an equally-good hit.
-12. Checks if all jobs are done
-13. Concatenates each jobfile's best_hit outfile together, cleans up extra outfiles and gets ready to produce the taxa table.
+6. Parses your raw BLAST results to add convenient taxonomy information (taxid, species) from description of the query sequence, and runs the R file get_best_hits.R (or get_best_hits_comp.R, get_best_hits_remote.R)
+7. Joins the NCBI taxonomy file to the raw blast output
+8. Summarises each sequence's best hits to identify how many species, genera, families, etc. are in the best scoring hits. Multiple equally-best-scoring hits occur when multiple species have identical sequences at the amplicon region.
+9. Returns a "best hit" entry for each sequence that includes the sequence number, the length of the alignment, the percent identity of the top hit, the assigned taxa, the taxonomic information for that hit (phylum, order, class, family, genus), the bitscore of the top hit, the number of species present in the potential best hits, and a comma-separated list of each species that was an equally-good hit.
+10. Uses the sample sequence files (_seqs.txt) and the combined_ASV.fasta file to associate sequences, assigned sequence numbers, reads, and samples.
+11. Joins the sample and sequence table with the best hits table to include the blast and best hit results for every sample/ASV in the dataset.
+12. Produces taxa tables for local blast, remote blast, compared remote/local blast, and summary tables that show sample by species (ie, ASVs are collapsed by species assignment) and species (ie, samples are collapsed and information about the number of reads/samples for a taxon in the entire dataset are returned).
 
-### Step Seven: Format "Unfiltered" Taxatable
 
-**Scripts**
-
-step_7_taxatable.sh
-run_ttb.sh
-
-**What This Step Does**
-
-1. As in previous steps, creates jobfiles containing X samples per job file where X=$( num_samples / max_jobs)
-2. For each sample, assigns taxonomy and "best hit" information to each ASV in the sample_seqs.txt file, if remote_comp is set to TRUE, does this separately for the remote and local best_hit files.
-3. Checks if jobs are done
-4. When jobs are done, concatenates job outfiles to create a master taxatable containing all ASVs for all samples, with taxonomy and best-hit information
-5. Cleans up extra outfiles.
-
-### Step eight: Filter Taxatable
+### Step eight: Filter Taxatable -not currently functional
 
 **Scripts**
 
