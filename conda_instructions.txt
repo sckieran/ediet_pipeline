@@ -1,0 +1,14 @@
+install conda, if necessary. Talk to your cluster admin about how to use conda on your local cluster.
+
+conda create -n pipeline
+source activate pipeline
+conda install bioconda::blast
+conda install bioconda::fastx_toolkit
+conda install conda-forge::biopython
+conda install anaconda::pandas
+conda install r::r-tidyverse
+conda install bioconda::pear
+
+
+OR
+conda create -n pipeline bioconda::blast bioconda::fastx_toolkit conda-forge::biopython anaconda::pandas bioconda::pear
