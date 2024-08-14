@@ -14,7 +14,7 @@ rbo$tax_id <- as.integer(str_split_fixed(rbo$taxon_info,"taxid=",2)[,2])
 
 t3 <- left_join(rbo,ncbi,by="tax_id")
 t3 <- t3[,1:14]
-t4 <- t3 %>% group_by(seqnum) %>% summarise(identity=mean(identity),"bitscore"=mean(bitscore),length=mean(length),n_species=n_distinct(species), species=paste(unique(species), collapse=','),n_genus=n_distinct(genus),genus=paste(unique(genus), collapse=','),n_family=n_distinct(family),family=paste(unique(family), collapse=','), n_order=n_distinct(order), order=paste(unique(order), collapse=',') ,n_class=n_distinct(class),class=paste(unique(class), collapse=','),n_phylum=n_distinct(phylum),phylum=paste(unique(phylum), collapse=','))
+t4 <- t3 %>% group_by(seqnum) %>% filter(bitscore==max(bitscore)) %>% summarise(identity=mean(identity),"bitscore"=mean(bitscore),length=mean(length),n_species=n_distinct(species), species=paste(unique(species), collapse=','),n_genus=n_distinct(genus),genus=paste(unique(genus), collapse=','),n_family=n_distinct(family),family=paste(unique(family), collapse=','), n_order=n_distinct(order), order=paste(unique(order), collapse=',') ,n_class=n_distinct(class),class=paste(unique(class), collapse=','),n_phylum=n_distinct(phylum),phylum=paste(unique(phylum), collapse=','))
 t4$resolution <- ifelse(!rowSums(t4 == 1), names(t4)[ncol(t4)], names(t4)[max.col(t4 == 1, 'first')])
 t4$resolution <- gsub("n_","",t4$resolution)
 
