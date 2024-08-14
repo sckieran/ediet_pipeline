@@ -22,7 +22,7 @@ max_jobs=10  #max number of jobs you want to submit to the cluster at one time. 
 extra_seqs="extra_seqs" #extra sequences that wouldn't be found in a genbank search that you want to add to your local database. name should be "extra_seqs_[gene]_sequences.fasta"
 filter=FALSE #do you want to filter your data by taxa after taxatables are built? See walkthrough for help.
 asv_rra=0 #do you want to pre-filter your data by ASV relative read abundance? Required for comparing local and remote results. If you don't want to pre-filter, set this value to 0.
-taxa_rra=0.005 #RRA value to filter taxa by if you set filter=TRUE
+#taxa_rra=0.005 #RRA value to filter taxa by if you set filter=TRUE
 identity_cutoff=97  #percent identity cutoff for taxa RRA filtering or returning BLAST hits. Use the literature for your gene/primer set to figure this out, 97-99 is common.
 minlen=70 #set a minimum length for ASVs, base this value on the length of your amplicon after trimming. 
 remote=FALSE #Do you want to run a remote-only BLAST search of the NCBI database?
@@ -113,81 +113,51 @@ do
   if [[ $remote == "TRUE" ]]
   then
     echo "building input FASTA and performing remote BLAST."
-    bash ${dir}/scripts/step_6_blast_remote.sh -n ${prefix} -g ${gene} -d ${dir} -m ${minlen} -c ${identity_cutoff} -t ${return_low} -j ${max_jobs} -u ${user} -e ${env_name}
+    bash ${dir}/scripts/new_step_6_blast_remote.sh -n ${prefix} -g ${gene} -d ${dir} -m ${minlen} -c ${identity_cutoff} -t ${return_low} -e ${env_name}
     exit_status=$?
     if [ "${exit_status}" -ne 0 ];
     then
       echo "Step 6 failed. exit ${exit_status} and restart at step 6."
       exit 1
     fi
-    echo "###"
-    echo "###"
-    echo "done with BLAST. Making raw (unfiltered) taxatable"
-    echo "###"
-    bash ${dir}/scripts/step_7_taxatable.sh ${prefix} ${gene} ${dir} ${max_jobs} ${user}
-    if [ "${exit_status}" -ne 0 ];
-    then
-      echo "Step 7 failed. exit ${exit_status} and restart at step 7."
-      exit 1
-    fi
-elif [[ $remote_comp == "TRUE" ]]
+    elif [[ $remote_comp == "TRUE" ]]
     then
     echo "performing both local and remote BLAST and comparing the two taxatables."
-    bash ${dir}/scripts/step_6_blast_comparison.sh -n ${prefix} -g ${gene} -d ${dir} -m ${minlen} -r ${db_dirr} -c ${identity_cutoff} -t ${return_low} -j ${max_jobs} -u ${user} -e ${env_name}
+    bash ${dir}/scripts/new_step_6_blast_comp.sh -n ${prefix} -g ${gene} -d ${dir} -m ${minlen} -r ${db_dirr} -c ${identity_cutoff} -t ${return_low} -e ${env_name}
     exit_status=$?
     if [ "${exit_status}" -ne 0 ];
     then
         echo "Step 6 failed. exit ${exit_status} and restart at step 6."
         exit 1
     fi
-    echo "###"
-    echo "###"
-    echo "done with BLAST. Making raw (unfiltered) taxatable"
-    echo "###"
-    bash ${dir}/scripts/step_7_taxatable_comp.sh ${prefix} ${gene} ${dir} ${max_jobs} ${user}
-    if [ "${exit_status}" -ne 0 ];
-    then
-      echo "Step 7 failed. exit ${exit_status} and restart at step 7."
-      exit 1
-    fi
   else
     echo "building input FASTA and performing local BLAST."
-    bash ${dir}/scripts/step_6_blast.sh -n ${prefix} -g ${gene} -d ${dir} -m ${minlen} -r ${db_dirr} -c ${identity_cutoff} -t ${return_low} -j ${max_jobs} -u ${user} -e ${env_name}
+    bash ${dir}/scripts/new_step_6_blast_local.sh -n ${prefix} -g ${gene} -d ${dir} -m ${minlen} -r ${db_dirr} -c ${identity_cutoff} -t ${return_low} -e ${env_name}
     exit_status=$?
     if [ "${exit_status}" -ne 0 ];
     then
       echo "Step 6 failed. exit ${exit_status} and restart at step 6."
       exit 1
     fi
-   echo "###"
-   echo "###"
-   echo "done with BLAST. Making raw (unfiltered) taxatable"
-   echo "###"
-   bash ${dir}/scripts/step_7_taxatable.sh ${prefix} ${gene} ${dir} ${max_jobs} ${user}
-    if [ "${exit_status}" -ne 0 ];
-    then
-      echo "Step 7 failed. exit ${exit_status} and restart at step 7."
-      exit 1
-    fi  
   fi
 
    
-   if [[ $filter == "TRUE" ]]
-   then
-     echo "Done making raw taxatable. You chose to filter your data by relative read abundance and percent identity. Now filtering per-sample taxa at your relative read abundance cutoff of ${taxa_rra} and your identity cutoff of ${identity_cutoff}."
-     if [[ $remote_comp == "TRUE" ]]
-     then
-         echo "This option cannot be used with remote_compare=TRUE. Skipping this step."
-         exit 1
-     fi
-     bash ${dir}/scripts/step_8_filter_data.sh ${prefix} ${gene} ${taxa_rra} ${identity_cutoff} ${dir} ${env_name}
-     exit_status=$?
-     if [ "${exit_status}" -ne 0 ];
-     then
-        echo "Step 5 failed. exit ${exit_status} and restart at step 5."
-        exit 1
-     fi
-     echo "###"
-     echo "all done with ${gene}. Moving on to next gene or exiting."
-    fi
+   #if [[ $filter == "TRUE" ]]
+   #then
+   #  echo "Done making raw taxatable. You chose to filter your data by relative read abundance and percent identity. Now filtering per-sample taxa at your relative read abundance cutoff of ${taxa_rra} and your identity cutoff of ${identity_cutoff}."
+    # if [[ $remote_comp == "TRUE" ]]
+     #then
+      #   echo "This option cannot be used with remote_compare=TRUE. Skipping this step."
+       #  exit 1
+     #fi
+     #bash ${dir}/scripts/step_8_filter_data.sh ${prefix} ${gene} ${taxa_rra} ${identity_cutoff} ${dir} ${env_name}
+     #exit_status=$?
+     #if [ "${exit_status}" -ne 0 ];
+     #then
+     #   echo "Step 5 failed. exit ${exit_status} and restart at step 5."
+     #   exit 1
+     #fi
+echo "###"
+echo "all done with ${gene}. Moving on to next gene or exiting."
+    #fi
   done < list_of_genes.txt
