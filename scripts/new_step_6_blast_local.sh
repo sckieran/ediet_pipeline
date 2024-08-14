@@ -52,6 +52,7 @@ cd ${dirr}/${gene}_out
 cat *_seqs.txt | cut -f1 | sort | uniq | awk -v m=$minlen '{ if (length($0) > m) print }' > temp_seqs
 sed -i '/^$/d' temp_seqs
 
+echo "making query fasta from sample sequences"
 	##make query fasta from seqlist#
 x=1
 n=$(wc -l temp_seqs | awk '{print $1}')
@@ -87,6 +88,7 @@ done
 paste -d '\n' ${prefix}_${gene}_headers temp_seqs > ${prefix}_${gene}_combined_ASVs.fasta
 rm temp_seqs ${prefix}_${gene}_headers
 
+echo "done with query sequences, looking for NCBI taxonomy file"
 cd ${dirr}
 if ls ncbi*.csv* 1> /dev/null 2>&1; then
 	echo "ncbi tax file found, beginning tax assessment"
