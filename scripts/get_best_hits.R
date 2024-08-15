@@ -49,9 +49,9 @@ taxa_table$best_hit[which(is.na(taxa_table$best_hit))] <- "No Hit"
 
 write_delim(taxa_table, paste0(args[4],args[1],"_",args[2],"_full_taxatable.txt"),delim="\t",quote="none")
 
-taxa_sample_summary <- taxa_table %>% group_by(sample,species) %>% summarise("reads"=sum(reads),"mean_identity"=(mean(identity)))
+taxa_sample_summary <- taxa_table %>% group_by(sample,best_hit) %>% summarise("reads"=sum(reads),"mean_identity"=(mean(identity)))
 write_delim(taxa_sample_summary, paste0(args[4],args[1],"_",args[2],"_sample_by_taxon_taxatable.txt"),delim="\t",quote="none")
 
-taxa_species_summary <- taxa_table %>% group_by(species) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample))
+taxa_species_summary <- taxa_table %>% group_by(best_hit) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample))
 write_delim(taxa_species_summary, paste0(args[4],args[1],"_",args[2],"_species_summary_taxatable.txt"),delim="\t",quote="none")
 
