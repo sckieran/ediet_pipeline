@@ -93,7 +93,7 @@ do
   echo "done with pears merging. Now collapsing ASVs with fastx-collapser"
   echo "###"
   
-  bash ${dir}/scripts/step_4_collapse.sh ${dir} ${R1_pattern} ${R2_pattern} ${max_jobs} ${user} ${gene}
+  bash ${dir}/scripts/step_4_collapse.sh ${dir} ${R1_pattern} ${R2_pattern} ${max_jobs} ${user} ${gene} ${env_name}
   exit_status=$?
   if [ "${exit_status}" -ne 0 ];
   then
