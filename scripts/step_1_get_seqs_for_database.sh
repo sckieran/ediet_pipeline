@@ -42,7 +42,7 @@ then
 db_dirr=reference_database
 fi
 mkdir -p $db_dirr
-cp $taxlist ./${db_dirr}
+cp ${taxlist}* ./${db_dirr}
 cp $genelist ./${db_dirr}
 
 
