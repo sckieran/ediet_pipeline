@@ -7,6 +7,7 @@ infil=$1
 pattern=$2
 r2_pattern=$3
 dir=$4
+env_name=$5
 
 cd ${dir}
 ##load conda
