@@ -1,6 +1,5 @@
 
 args = commandArgs(trailingOnly=TRUE)
-library(lubridate,lib=args[5])
 library(tidyverse,lib=args[5])
 setwd(args[1])
 full <- read.delim(args[2])
