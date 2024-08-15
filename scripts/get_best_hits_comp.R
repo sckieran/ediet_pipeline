@@ -87,14 +87,14 @@ combo_taxa_table$best_hit[which(is.na(taxa_table$best_hit))] <- "No Hit"
 names(combo_taxa_table)[names(combo_taxa_table) == 'best_hit'] <- 'best_hit_local'
 write_delim(local_taxa_table, paste0(args[4],"/",args[1],"_",args[2],"_full_combined_localremote_taxatable.txt"),delim="\t",quote="none")
 
-local_taxa_sample_summary <- local_taxa_table %>% group_by(sample,species) %>% summarise("reads"=sum(reads),"mean_identity"=(mean(identity)))
+local_taxa_sample_summary <- local_taxa_table %>% group_by(sample,best_hit) %>% summarise("reads"=sum(reads),"mean_identity"=(mean(identity)))
 write_delim(local_taxa_sample_summary, paste0(args[4],"/",args[1],"_",args[2],"_sample_by_taxon_taxatable.txt"),delim="\t",quote="none")
 
-local_taxa_species_summary <- local_taxa_table %>% group_by(species) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample))
+local_taxa_species_summary <- local_taxa_table %>% group_by(best_hit) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample))
 write_delim(t3, paste0(args[4],"/",args[1],"_",args[2],"_species_summary_taxatable.txt"),delim="\t",quote="none")
 
-remote_taxa_sample_summary <- remote_taxa_table %>% group_by(sample,species) %>% summarise("reads"=sum(reads),"mean_identity"=(mean(identity)))
+remote_taxa_sample_summary <- remote_taxa_table %>% group_by(sample,best_hit_remote) %>% summarise("reads"=sum(reads),"mean_identity"=(mean(identity)))
 write_delim(remote_taxa_sample_summary, paste0(args[4],"/",args[1],"_",args[2],"_sample_by_taxon_taxatable.txt"),delim="\t",quote="none")
 
-remote_taxa_species_summary <- remote_taxa_table %>% group_by(species) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample))
+remote_taxa_species_summary <- remote_taxa_table %>% group_by(best_hit_remote) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample))
 write_delim(remote_taxa_species_summary, paste0(args[4],"/",args[1],"_",args[2],"_species_summary_taxatable.txt"),delim="\t",quote="none")
