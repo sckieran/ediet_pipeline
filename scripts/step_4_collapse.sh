@@ -7,7 +7,7 @@ r2_pattern=$3
 max_jobs=$4
 user=$5
 gene=$6
-
+env_name=$7
 
 cat ${dir}/slurm_template.txt ${dir}/scripts/run_collapser.sh > ${dir}/scripts/run_collapser_full.sh
 
@@ -64,7 +64,7 @@ do
       while true;
      	do
      		echo "outfile for $fil does not yet exist or is empty. Doing $fil."
-     		res=$(sbatch ${dir}/scripts/run_collapser_full.sh $fil ${dir}/${gene})
+     		res=$(sbatch ${dir}/scripts/run_collapser_full.sh $fil ${dir}/${gene} ${env_name})
    		if squeue -u $user | grep -q "${res##* }"; 
    		then
    			echo "job ${res##* } for $fil submitted successfully."
