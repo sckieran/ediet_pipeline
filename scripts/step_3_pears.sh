@@ -6,6 +6,7 @@ dir=$3
 max_jobs=$4
 user=$5
 gene=$6
+env_name=$7
 
 cd ${dir}/${gene}
 
@@ -59,7 +60,7 @@ do
       while true;
      			do
      				echo "outfile for $fil does not yet exist or is empty. Doing $fil."
-     				res=$(sbatch ${dir}/scripts/pear_full.sh $fil $pattern $r2_pattern ${dir}/${gene})
+     				res=$(sbatch ${dir}/scripts/pear_full.sh $fil $pattern $r2_pattern ${dir}/${gene} ${env_name})
    			  	if squeue -u $user | grep -q "${res##* }"; 
    	  			then
      					echo "job ${res##* } for $fil submitted successfully."
