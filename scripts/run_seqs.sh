@@ -15,6 +15,7 @@ cd ${dir}/${gene}
 conda_source=$(conda info | grep -i 'base environment' | awk -F":" '{print $2}'| awk -F" " '{print $1}')
 source ${conda_source}/etc/profile.d/conda.sh
 conda activate ${env_name}
+pref=$CONDA_PREFIX
 #source activate ${env_name}
 
 
