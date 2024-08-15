@@ -47,11 +47,27 @@ seq_table$seqnum <- gsub(">","",seq_table$seqnum)
 taxa_table <- left_join(seq_table,bbh,by="seqnum")
 taxa_table$best_hit[which(is.na(taxa_table$best_hit))] <- "No Hit"
 
+
+bbh_tax <- unique(taxa_table[,c(1,5,9:15)])
+bbh_tax$species[bbh_tax$best_resolution!="species"] <- "Not Resolved"
+bbh_tax$genus[bbh_tax$best_resolution=="family"] <- "Not Resolved"
+bbh_tax$genus[bbh_tax$best_resolution=="order"] <- "Not Resolved"
+bbh_tax$genus[bbh_tax$best_resolution=="class"] <- "Not Resolved"
+bbh_tax$genus[bbh_tax$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax$family[bbh_tax$best_resolution=="order"] <- "Not Resolved"
+bbh_tax$family[bbh_tax$best_resolution=="class"] <- "Not Resolved"
+bbh_tax$family[bbh_tax$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax$order[bbh_tax$best_resolution=="class"] <- "Not Resolved"
+bbh_tax$order[bbh_tax$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax$class[bbh_tax$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax <- unique(bbh_tax)
+
 write_delim(taxa_table, paste0(args[4],args[1],"_",args[2],"_full_taxatable.txt"),delim="\t",quote="none")
 
 taxa_sample_summary <- taxa_table %>% group_by(sample,best_hit) %>% summarise("reads"=sum(reads),"mean_identity"=(mean(identity)))
-write_delim(taxa_sample_summary, paste0(args[4],args[1],"_",args[2],"_sample_by_taxon_taxatable.txt"),delim="\t",quote="none")
+taxa_sample_summary2 <- left_join(taxa_sample_summary, bbh_tax,by=c("sample"="sample","best_hit"="best_hit"))
+write_delim(taxa_sample_summary2, paste0(args[4],args[1],"_",args[2],"_sample_by_taxon_taxatable.txt"),delim="\t",quote="none")
 
-taxa_species_summary <- taxa_table %>% group_by(best_hit) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample))
+taxa_species_summary <- taxa_table %>% group_by(best_hit) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample),best_resolution=unique(best_resolution))
 write_delim(taxa_species_summary, paste0(args[4],args[1],"_",args[2],"_species_summary_taxatable.txt"),delim="\t",quote="none")
 
