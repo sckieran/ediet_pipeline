@@ -78,9 +78,37 @@ local_taxa_table <- left_join(seq_table,bbh,by="seqnum")
 local_taxa_table$best_hit[which(is.na(local_taxa_table$best_hit))] <- "No Hit"
 write_delim(local_taxa_table, paste0(args[4],"/",args[1],"_",args[2],"_full_local_taxatable.txt"),delim="\t",quote="none")
 
+bbh_tax <- unique(local_taxa_table[,c(1,5,9:15)])
+bbh_tax$species[bbh_tax$best_resolution!="species"] <- "Not Resolved"
+bbh_tax$genus[bbh_tax$best_resolution=="family"] <- "Not Resolved"
+bbh_tax$genus[bbh_tax$best_resolution=="order"] <- "Not Resolved"
+bbh_tax$genus[bbh_tax$best_resolution=="class"] <- "Not Resolved"
+bbh_tax$genus[bbh_tax$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax$family[bbh_tax$best_resolution=="order"] <- "Not Resolved"
+bbh_tax$family[bbh_tax$best_resolution=="class"] <- "Not Resolved"
+bbh_tax$family[bbh_tax$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax$order[bbh_tax$best_resolution=="class"] <- "Not Resolved"
+bbh_tax$order[bbh_tax$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax$class[bbh_tax$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax <- unique(bbh_tax)
+
 remote_taxa_table <- left_join(seq_table,bbh_r,by="seqnum")
 remote_taxa_table$best_hit_remote[which(is.na(remote_taxa_table$best_hit_remote))] <- "No Hit"
 write_delim(local_taxa_table, paste0(args[4],"/",args[1],"_",args[2],"_full_local_taxatable.txt"),delim="\t",quote="none")
+
+bbh_tax_r <- unique(remote_taxa_table[,c(1,5,9:15)])
+bbh_tax_r$species[bbh_tax_r$best_resolution!="species"] <- "Not Resolved"
+bbh_tax_r$genus[bbh_tax_r$best_resolution=="family"] <- "Not Resolved"
+bbh_tax_r$genus[bbh_tax_r$best_resolution=="order"] <- "Not Resolved"
+bbh_tax_r$genus[bbh_tax_r$best_resolution=="class"] <- "Not Resolved"
+bbh_tax_r$genus[bbh_tax_r$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax_r$family[bbh_tax_r$best_resolution=="order"] <- "Not Resolved"
+bbh_tax_r$family[bbh_tax_r$best_resolution=="class"] <- "Not Resolved"
+bbh_tax_r$family[bbh_tax_r$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax_r$order[bbh_tax_r$best_resolution=="class"] <- "Not Resolved"
+bbh_tax_r$order[bbh_tax_r$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax_r$class[bbh_tax_r$best_resolution=="phylum"] <- "Not Resolved"
+bbh_tax_r <- unique(bbh_tax_r)
 
 combo_taxa_table <- left_join(seq_table,bbh_full,by="seqnum")
 combo_taxa_table$best_hit[which(is.na(taxa_table$best_hit))] <- "No Hit"
@@ -88,13 +116,15 @@ names(combo_taxa_table)[names(combo_taxa_table) == 'best_hit'] <- 'best_hit_loca
 write_delim(local_taxa_table, paste0(args[4],"/",args[1],"_",args[2],"_full_combined_localremote_taxatable.txt"),delim="\t",quote="none")
 
 local_taxa_sample_summary <- local_taxa_table %>% group_by(sample,best_hit) %>% summarise("reads"=sum(reads),"mean_identity"=(mean(identity)))
-write_delim(local_taxa_sample_summary, paste0(args[4],"/",args[1],"_",args[2],"_sample_by_taxon_taxatable.txt"),delim="\t",quote="none")
+local_taxa_sample_summary2 <- left_join(local_taxa_sample_summary, bbh_tax,by=c("sample"="sample","best_hit"="best_hit"))
+write_delim(local_taxa_sample_summary2, paste0(args[4],"/",args[1],"_",args[2],"_sample_by_taxon_taxatable.txt"),delim="\t",quote="none")
 
-local_taxa_species_summary <- local_taxa_table %>% group_by(best_hit) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample))
+local_taxa_species_summary <- local_taxa_table %>% group_by(best_hit) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample),best_resolution=unique(best_resolution))
 write_delim(t3, paste0(args[4],"/",args[1],"_",args[2],"_species_summary_taxatable.txt"),delim="\t",quote="none")
 
 remote_taxa_sample_summary <- remote_taxa_table %>% group_by(sample,best_hit_remote) %>% summarise("reads"=sum(reads),"mean_identity"=(mean(identity)))
-write_delim(remote_taxa_sample_summary, paste0(args[4],"/",args[1],"_",args[2],"_sample_by_taxon_taxatable.txt"),delim="\t",quote="none")
+remote_taxa_sample_summary2 <- left_join(remote_taxa_sample_summary, bbh_tax_r,by=c("sample"="sample","best_hit"="best_hit"))
+write_delim(remote_taxa_sample_summary2, paste0(args[4],"/",args[1],"_",args[2],"_sample_by_taxon_taxatable.txt"),delim="\t",quote="none")
 
-remote_taxa_species_summary <- remote_taxa_table %>% group_by(best_hit_remote) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample))
+remote_taxa_species_summary <- remote_taxa_table %>% group_by(best_hit_remote) %>% summarise("reads"=sum(reads),mean_identity=(mean(identity)),"n_samps"=n_distinct(sample),best_resolution=unique(best_resolution))
 write_delim(remote_taxa_species_summary, paste0(args[4],"/",args[1],"_",args[2],"_species_summary_taxatable.txt"),delim="\t",quote="none")
