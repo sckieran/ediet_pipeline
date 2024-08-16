@@ -91,6 +91,3 @@ do
   ls *_paired.assembled.fastq > outslist
   num_outs=$( wc -l outslist | awk '{print $1}')
 done
-
-rm pears.*.err
-rm pears.*.out
