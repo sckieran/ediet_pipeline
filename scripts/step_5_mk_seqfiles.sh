@@ -12,6 +12,8 @@ cat ${dir}/slurm_template.txt ${dir}/scripts/run_seqs.sh > ${dir}/scripts/run_se
 
 cd ${dir}/${gene}
 mkdir -p ./unfiltered_seqfiles
+mv fx_col.*.err ./errs_and_outs/
+mv fx_col.*.out ./errs_and_outs/
 
 ls *_clustered.fasta > collapselist
 num_seqs=$( wc -l collapselist | awk '{print $1}')
@@ -87,8 +89,8 @@ do
   num_outs=$( wc -l outslist | awk '{print $1}')
   echo "there are $num_seqs sequences to make seqfiles for and $num_outs seqfiles. If these numbers don't match, will resubmit jobs as necessary. If these numbers do match, moving on to BLASTing your sequences."
 done
-rm mksq.*.err
-rm mksq.*.out
+mv mksq.*.err ./errs_and_outs/
+mv mksq.*.out ./errs_and_outs/
 mv *_clustered.fasta ./collapsed/
 mv *_filtered_seqs.txt ./seqfiles/
 rm collapselist_*
