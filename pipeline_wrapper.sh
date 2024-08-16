@@ -87,7 +87,10 @@ do
     echo "Step 3 failed. exit ${exit_status} and restart at step 3."
     exit 1
   fi
- 
+ done < list_of_genes.txt
+ while read p;
+do
+  gene=$p
   echo "###"
   echo "###"
   echo "done with pears merging. Now collapsing ASVs with fastx-collapser"
@@ -104,7 +107,10 @@ do
   echo "###"
   echo "done collapsing samples into unique ASVs. Making per-sample ASV files."
   echo "###"
-
+done < list_of_genes.txt
+while read p;
+do
+  gene=$p
   bash ${dir}/scripts/step_5_mk_seqfiles.sh ${dir} ${asv_rra} ${gene} ${max_jobs} ${user} ${minlen} ${env_name}
   exit_status=$?
   if [ "${exit_status}" -ne 0 ];
@@ -116,6 +122,10 @@ do
   echo "###"
   echo "done making seqfiles. RRA filtering ASV/sample done at your filter level of ${taxa_rra}. Beginning the BLAST process"
   echo "###"
+  done < list_of_genes.txt
+  while read p;
+do
+  gene=$p
   if [[ $remote == "TRUE" ]]
   then
     echo "building input FASTA and performing remote BLAST."
