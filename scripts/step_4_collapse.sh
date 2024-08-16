@@ -14,11 +14,13 @@ cat ${dir}/slurm_template.txt ${dir}/scripts/run_collapser.sh > ${dir}/scripts/r
 cd ${dir}/${gene}
 
 #clean up files#
-mkdir -p unpaired paired collapsed seqfiles paired/unassembled  paired/discarded
+mkdir -p unpaired paired collapsed seqfiles paired/unassembled  paired/discarded err_and_outs
 mv *${pattern} ./unpaired/
 mv *${r2_pattern} ./unpaired/
 mv *.discarded.fastq ./paired/discarded/
 mv *.unassembled*.fastq ./paired/unassembled/
+mv pears.*.err ./err_and_outs/
+mv pears.*.out ./err_and_outs
 rm seqlist_* 
 rm outslist
 
