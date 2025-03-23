@@ -38,7 +38,8 @@ do
   fi
 done
 rm collapselist
-while [[ $num_seqs -ne $num_outs ]];
+
+while [[ $num_seqs -ne $num_outs &&  $num_jobs < 1000]];
 do
   for fil in collapselist_*;
   do
@@ -87,6 +88,7 @@ do
   done
   ls *_filtered_seqs.txt > outslist
   num_outs=$( wc -l outslist | awk '{print $1}')
+  num_jobs=$(ls mksq.*.err | wc -l | awk '{print $1}')
   echo "there are $num_seqs sequences to make seqfiles for and $num_outs seqfiles. If these numbers don't match, will resubmit jobs as necessary. If these numbers do match, moving on to BLASTing your sequences."
 done
 mv mksq.*.err ./errs_and_outs/
