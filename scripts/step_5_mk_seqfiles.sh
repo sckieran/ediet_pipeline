@@ -25,19 +25,25 @@ fi
 echo "there were $num_seqs samples to make seqfiles for and $tot_per_file sample(s) per job."
 
 #cut into slurm jobs for faster processing#
-x=1
-while [[ $x -le ${max_jobs} ]];
-do
-  if [[ -s collapselist ]];
-  then
-    head -n ${tot_per_file} collapselist > collapselist_${x}
-    sed -i "1,${tot_per_file}d" collapselist
-    x=$(( $x + 1 ))
-  else
-    x=$(( $max_jobs + 1 ))
-  fi
-done
+#x=1
+#while [[ $x -le ${max_jobs} ]];
+#do
+#  if [[ -s collapselist ]];
+#  then
+#    head -n ${tot_per_file} collapselist > collapselist_${x}
+#    sed -i "1,${tot_per_file}d" collapselist
+#    x=$(( $x + 1 ))
+#  else
+#    x=$(( $max_jobs + 1 ))
+#  fi
+#done
+split -n ${max_jobs} --numeric-suffixes=1 collapselist collapselist_
 rm collapselist
+
+ls *_filtered_seqs.txt > outslist
+
+num_outs=$( wc -l outslist | awk '{print $1}')
+num_jobs=$(ls mksq.*.err | wc -l | awk '{print $1}')
 
 while [[ $num_seqs -ne $num_outs &&  $num_jobs < 1000]];
 do
