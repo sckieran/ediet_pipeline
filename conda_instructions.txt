@@ -11,4 +11,4 @@ conda install bioconda::pear
 
 
 OR
-conda create -n pipeline bioconda::blast bioconda::fastx_toolkit conda-forge::biopython anaconda::pandas bioconda::pear
+conda create -n pipeline bioconda::blast bioconda::fastx_toolkit conda-forge::biopython anaconda::pandas r::r-tidyverse bioconda::pear
