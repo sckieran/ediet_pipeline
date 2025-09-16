@@ -103,5 +103,5 @@ echo "there are $num_seqs input samples and $num_outs clustered output samples. 
 rm outslist
 rm pairedlist_*
 mv *_paired.assembled.fastq ./paired/
-rm fx_col.*.err
-rm fx_col.*.out
+#rm fx_col.*.err
+#rm fx_col.*.out
