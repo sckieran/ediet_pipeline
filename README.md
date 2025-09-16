@@ -40,7 +40,7 @@ This pipeline assumes reasonably good resolution of locus data and is designed a
 
 `conda config --set channel_priority strict`
 
-`conda create -n pipeline bioconda::blast bioconda::fastx_toolkit conda-forge::biopython anaconda::pandas bioconda::pear`
+`conda create -n pipeline bioconda::blast bioconda::fastx_toolkit conda-forge::biopython anaconda::pandas r::r-tidyverse bioconda::pear`
 
 `conda activate pipeline` #just to check that it installed correctly
 
