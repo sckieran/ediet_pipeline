@@ -21,20 +21,4 @@ while read fil;
 do
   base=$(echo $fil | awk -F"$pattern" '{print $1}')
   pear -f ${fil} -r ${base}${r2_pattern} -o ${base}_paired -j 10
-  seq=$(tail -n 4 "${base}_paired.assembled.fastq" | sed -n '2p')
-  qual=$(tail -n 4 "${base}_paired.assembled.fastq" | sed -n '4p')
-  if [ ${#seq} -eq ${#qual} ]; 
-  then
-    echo "$f: OK (seq=${#seq}, qual=${#qual})"
-  else
-    echo "$f: MISMATCH (seq=${#seq}, qual=${#qual}), re-pairing with fewer threads"
-    pear -f ${fil} -r ${base}${r2_pattern} -o ${base}_paired -j 4
-    seq=$(tail -n 4 "${base}_paired.assembled.fastq" | sed -n '2p')
-    qual=$(tail -n 4 "${base}_paired.assembled.fastq" | sed -n '4p')
-    if [ ${#seq} -eq ${#qual} ]; 
-    then
-      echo "problem remains with ${fil}; truncating final sequence"
-      tmp=$(mktemp) && head -n -4 "${base}_paired.assembled.fastq" > "$tmp" && mv "$tmp" "${base}_paired.assembled.fastq"
-    fi
-  fi      
 done < $infil
