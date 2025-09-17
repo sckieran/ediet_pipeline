@@ -34,8 +34,8 @@ do
     rm temp_reads_${base} temp_seqs_${base}
   else
     echo "$fil is empty or does not exist. Omitting $fil to avoid downstream errors. Check infiles and error logs for step 3 and 4 for $fil."
-    echo -n "" > ${dir}/${gene}/${base}_filtered_seqs.txt
-    echo -n "" > ${dir}/${gene}/${base}_seqs.txt
+    touch > ${dir}/${gene}/${base}_filtered_seqs.txt
+    touch > ${dir}/${gene}/${base}_seqs.txt
   fi
 done < ${inp}
 
