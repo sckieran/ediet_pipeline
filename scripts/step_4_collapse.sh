@@ -34,20 +34,10 @@ then
 fi
 echo "there were $num_seqs samples to cluster and $tot_per_file sample(s) per job."
 
-#cut into slurm jobs for faster processing#
-x=1
-while [[ $x -le ${max_jobs} ]];
-do
-  if [[ -s pairedlist ]];
-  then
-    head -n ${tot_per_file} pairedlist > pairedlist_${x}
-    sed -i "1,${tot_per_file}d" pairedlist
-    x=$(( $x + 1 ))
-  else
-    x=$(( $max_jobs + 1 ))
-  fi
-done
+
+split -n ${max_jobs} --numeric-suffixes=1 pairedlist pairedlist_
 rm pairedlist
+
 while [[ $num_seqs -ne $num_outs ]];
 do
   for fil in pairedlist_*;
@@ -58,6 +48,7 @@ do
       if [[ ! -f ${base}_clustered.fasta ]];
       then
         echo "$p" >> temp_$fil
+		echo "$p is not done"
       fi
     done < ${fil}
     if [[  -s temp_${fil} ]];
@@ -65,7 +56,7 @@ do
     then
       while true;
      	do
-     		echo "outfile for $fil does not yet exist or is empty. Doing $fil."
+     		echo "outfile for at least one sample in $fil does not yet exist or is empty. Doing $fil."
      		res=$(sbatch ${dir}/scripts/run_collapser_full.sh $fil ${dir}/${gene} ${env_name})
    		if squeue -u $user | grep -q "${res##* }"; 
    		then
