@@ -21,7 +21,8 @@ pref=$CONDA_PREFIX
 
 while read fil;
 do
-  if [[ -s $fil ]];
+  wc=$(wc -l $fil | awk '{print $1}')
+  if [[ ${wc} -ge 4 ]];
   then
     base=$(echo $fil | awk -F"_clustered.fasta" '{print $1}')
     grep ">" $fil | awk -F"-" '{print $2}' > temp_reads_${base}
@@ -33,7 +34,7 @@ do
     mv ${base}_seqs.txt ./unfiltered_seqfiles/${base}_seqs.txt
     rm temp_reads_${base} temp_seqs_${base}
   else
-    echo "$fil is empty or does not exist. Omitting $fil to avoid downstream errors. Check infiles and error logs for step 3 and 4 for $fil."
+    echo "$fil is empty or truncated. Omitting $fil to avoid downstream errors. Check infiles and error logs for step 3 and 4 for $fil."
     touch ${dir}/${gene}/${base}_filtered_seqs.txt
     touch ${dir}/${gene}/${base}_seqs.txt
   fi
