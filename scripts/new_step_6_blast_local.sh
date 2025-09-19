@@ -70,9 +70,15 @@ else
 	wget -N ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
 	mkdir -p taxdump && tar zxf taxdump.tar.gz -C ./taxdump
 	ncbitax2lin --nodes-file taxdump/nodes.dmp --names-file taxdump/names.dmp
-	cp ncbi*.csv* ${dirr}/${gene}_out/
-	cd ${dirr}/${gene}_out/
-	gunzip ncbi*.csv.gz
+ 	if ls ncbi*.csv* 1> /dev/null 2>&1; 
+  	then
+		cp ncbi*.csv* ${dirr}/${gene}_out/
+		cd ${dirr}/${gene}_out/
+		gunzip ncbi*.csv.gz
+  	else
+   		echo "after attempting to install ncbitax2lin, still cannot find ncbi tax file. Exiting. Recommend installing ncbitax2lin separately, following instructions at https://github.com/zyxue/ncbitax2lin, then running this step again. Alternatively, an old version of an ncbi taxonomy file is available in the ediet_pipeline folder or on the ediet_pipeline github, simply copy it into your project directory."
+	 	exit 1
+   	fi
 fi
 
 cd ${dirr}/${gene}_out
