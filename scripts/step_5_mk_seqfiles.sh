@@ -1,5 +1,5 @@
 #!/bin/bash
-module load R/4.2.3
+
 dir=$1
 cutoff=$2
 gene=$3
