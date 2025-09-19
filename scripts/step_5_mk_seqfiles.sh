@@ -32,7 +32,7 @@ ls *_filtered_seqs.txt > outslist
 num_outs=$( wc -l outslist | awk '{print $1}')
 num_jobs=$(ls mksq.*.err | wc -l | awk '{print $1}')
 
-while [[ $num_seqs -ne $num_outs &&  $num_jobs -le 1000]];
+while [[ $num_seqs -ne $num_outs && $num_jobs -le 1000 ]];
 do
   for fil in collapselist_*;
   do
@@ -49,18 +49,18 @@ do
     then
     mv temp_${fil} ${fil}
       while true;
-     	do
-     		echo "outfile for at least one sample in $fil does not yet exist or is empty. Doing $fil."
-     		res=$(sbatch ${dir}/scripts/run_seqs_full.sh $fil ${dir} ${gene} ${cutoff} ${minlen} ${env_name})
+	  do
+   		echo "outfile for at least one sample in $fil does not yet exist or is empty. Doing $fil."
+	 	res=$(sbatch ${dir}/scripts/run_seqs_full.sh $fil ${dir} ${gene} ${cutoff} ${minlen} ${env_name})
    		if squeue -u $user | grep -q "${res##* }"; 
    		then
    		  echo "job ${res##* } for $fil submitted successfully."
        			break
-     		elif [[ -f mksq.${res##* }.err ]];
+     	elif [[ -f mksq.${res##* }.err ]];
 	  	then
 	  		echo "job ${res##* } for $fil submitted successfully."
-     			break
-    		else
+     		break
+    	else
 	 		echo "job ${res##* } did not submit. Trying again."
 	 	fi
   	  done
