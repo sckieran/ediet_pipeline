@@ -24,7 +24,7 @@ then
 fi
 echo "there were $num_seqs samples to make seqfiles for and $tot_per_file sample(s) per job."
 
-split -n ${max_jobs} --numeric-suffixes=1 collapselist collapselist_
+split -n l/${max_jobs} --numeric-suffixes=1 collapselist collapselist_
 rm collapselist
 
 ls *_filtered_seqs.txt > outslist
