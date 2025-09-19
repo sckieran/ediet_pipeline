@@ -53,34 +53,7 @@ echo "making query fasta from sample sequences"
 x=1
 n=$(wc -l temp_seqs | awk '{print $1}')
 touch ${prefix}_${gene}_headers
-while [[ $x -le $n ]]
-do
-	if [[ $x -le 9 ]]
- 	then 
-		echo ">seq_00000${x}" >> ${prefix}_${gene}_headers
-		x=$(( $x + 1 ))
-	elif [[ $x -le 99 ]] && [[ $x -ge 10 ]]
-	then
-		echo ">seq_0000${x}" >> ${prefix}_${gene}_headers
-		x=$(( $x + 1 ))
-	elif [[ $x -le 999 ]] && [[ $x -ge 100 ]]
-	then 
-		echo ">seq_000${x}" >> ${prefix}_${gene}_headers
-		x=$(( $x + 1 ))
-	elif [[ $x -le 9999 ]] && [[ $x -ge 1000 ]]
-	then
-		echo ">seq_00${x}" >> ${prefix}_${gene}_headers
-		x=$(( $x + 1 ))
-	elif [[ $x -le 99999 ]] && [[ $x -ge 10000 ]]
-	then
-		echo ">seq_0${x}" >> ${prefix}_${gene}_headers
-		x=$(( $x + 1 ))
-	elif [[ $x -ge 100000 ]]
-	then
-		echo ">seq_${x}" >> ${prefix}_${gene}_headers
-		x=$(( $x + 1 ))
-	fi
-done
+seq -f ">seq_%07g" "$n" > ${prefix}_${gene}_headers
 paste -d '\n' ${prefix}_${gene}_headers temp_seqs > ${prefix}_${gene}_combined_ASVs.fasta
 rm temp_seqs ${prefix}_${gene}_headers
 
