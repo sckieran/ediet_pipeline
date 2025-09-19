@@ -23,7 +23,7 @@ then
 fi
 echo "there were $num_seqs samples to pear and $tot_per_file sample(s) per job."
 
-x=1
+#x=1
 #while [[ $x -le ${max_jobs} ]];
 #do
  # echo "x is $x and max_jobs is $max_jobs"
@@ -40,7 +40,7 @@ x=1
     #x=$(( ${max_jobs} + 1 ))
  # fi
 #done
-split -n ${max_jobs} --numeric-suffixes=1 seqlist seqlist_
+split -n l/${max_jobs} --numeric-suffixes=1 seqlist seqlist_
 rm seqlist
 num_outs=1
 while [[ $num_outs -ne $num_seqs ]];
