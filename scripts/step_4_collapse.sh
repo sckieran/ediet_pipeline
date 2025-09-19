@@ -35,7 +35,7 @@ fi
 echo "there were $num_seqs samples to cluster and $tot_per_file sample(s) per job."
 
 
-split -n ${max_jobs} --numeric-suffixes=1 pairedlist pairedlist_
+split -n l/${max_jobs} --numeric-suffixes=1 pairedlist pairedlist_
 rm pairedlist
 
 while [[ $num_seqs -ne $num_outs ]];
