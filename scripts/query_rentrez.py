@@ -104,16 +104,25 @@ for gene in list_of_genes:
                     else:
                         h6 = Entrez.esummary(db="taxonomy", id=id2)
                         r6 = Entrez.read(h6)
-                        taxgenus2 = str(r6[0]['Genus'])
+                        taxgenus2 = str(r6[0]['ScientificName'])
                         taxspecies2 = str(r6[0]['Species'])
-                        taxname2=f"{taxgenus2} {taxspecies2}"
+                        #print(taxgenus2)
+                        words = taxgenus2.split()
+                        if len(words) >= 2:
+                            first_two_words = words[0] + " " + words[1]
+                            #print(first_two_words)
+                        elif len(words) == 1:
+                            first_two_words = words[0]
+                        else:
+                            print("no taxonomic info provided, moving to ncbi lineage data.")
+                        taxname2=first_two_words
                         #print(r6[0]['Rank'])
                         if r6[0]['Rank'] == "subspecies":
                             print("taxa's rank is subspecies. Checking if it is subspecies of correct species.")
-                            #print(taxname2, "=", taxname)
+                            print(taxname2, "=", taxname)
                             if taxname2 == taxname:
                                 new_ids.append(id)
-                                print("all taxa are a subspecies of species in taxlist, including in reference database.")
+                                print("taxon is a subspecies of species in taxlist, including in reference database.")
                 ln2 = f"{taxname}\t{avail_seq}\t{num_avail}\t{true_taxid}\n"
                 out.write(ln2)
                 fname = f"{prefix}_{genus}_{species}_{gene}_sequences.fasta"
