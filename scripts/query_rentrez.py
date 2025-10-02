@@ -58,7 +58,7 @@ for gene in list_of_genes:
             species = taxname.split()[1]
             genus_all.append(genus)
             taxiddict = {accession: id for key, value in []}
-        if species == "sp." or species == "sp:
+        if species == "sp." or species == "sp":
             term_search = f"{genus}[ORGN] AND ({gene_terms})"
             results = Entrez.esearch(db="nuccore", term=term_search, retmax=20)
             result = Entrez.read(results)
