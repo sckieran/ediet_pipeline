@@ -62,7 +62,7 @@ for gene in list_of_genes:
             term_search = f"{genus}[ORGN] AND ({gene_terms})"
             results = Entrez.esearch(db="nuccore", term=term_search, retmax=20)
             result = Entrez.read(results)
-            print("Doing taxon", x, "of", taxlen, "taxon is ", taxname, " sp. NCBI returns", len(result['IdList']), " result(s) for", gene)
+            print("Doing taxon", x, "of", taxlen, "taxon is ", genus, " sp. NCBI returns", len(result['IdList']), " result(s) for", gene)
             x += 1
             if (int(result['Count'])) <= 0:
                 ln2 = f"{taxname}\tno\t0\tNA\n"
