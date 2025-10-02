@@ -45,95 +45,131 @@ for gene in list_of_genes:
     x = 1
     taxlen = len(taxalist2.readlines())
     for line in taxalist:
-        taxname = line.strip()
-        taxiddict = {accession: id for key, value in []}
-        genus = taxname.split()[0]
-        species = taxname.split()[1]
-        genus_all.append(genus)
-        term_search = f"{taxname}[ORGN] AND ({gene_terms})"
-        results = Entrez.esearch(db="nuccore", term=term_search, retmax=20)
-        result = Entrez.read(results)
-        print("Doing taxon", x, "of", taxlen, "species is", genus, species, "NCBI returns", len(result['IdList']),
-              "result(s) for", gene)
-        x += 1
-        if (int(result['Count'])) <= 0:
-            ln2 = f"{taxname}\tno\t0\tNA\n"
-            out.write(ln2)
+        delimiter_index = s.find(' ')
+        if delimiter_index == -1:
+            taxname=line()
+            taxiddict = {accession: id for key, value in []}
+            genus=line()
+            species="sp."
+            genus_all.append(genus)
         else:
-            genus_yes.append(genus)
-            avail_seq = "yes"
-            num_avail = int(result['Count'])
-            ids = result['IdList']
-            handle = Entrez.esummary(db="nuccore", id=ids, rettype="gb")
-            records = Entrez.read(handle)
-            #print(records)
-            for record in records:
-                accession = record['Id']
-                taxids = int(record['TaxId'])
-                taxiddict.update({accession: taxids})
-            #print(len(list(set(list(taxiddict.values())))))
-            if len(list(set(list(taxiddict.values())))) == 1:
+            taxname = line.strip()
+            genus = taxname.split()[0]
+            species = taxname.split()[1]
+            genus_all.append(genus)
+            taxiddict = {accession: id for key, value in []}
+        if species == "sp." or species == "sp:
+            term_search = f"{genus}[ORGN] AND ({gene_terms})"
+            results = Entrez.esearch(db="nuccore", term=term_search, retmax=20)
+            result = Entrez.read(results)
+            print("Doing taxon", x, "of", taxlen, "taxon is ", taxname, " sp. NCBI returns", len(result['IdList']), " result(s) for", gene)
+            x += 1
+            if (int(result['Count'])) <= 0:
+                ln2 = f"{taxname}\tno\t0\tNA\n"
+                out.write(ln2)
+            else:
+                genus_yes.append(taxname)
+                avail_seq = "yes"
+                num_avail = int(result['Count'])
+                ids = result['IdList']
+                handle = Entrez.esummary(db="nuccore", id=ids, rettype="gb")
+                records = Entrez.read(handle)
+                # print(records)
                 tid = int(records[0]['TaxId'])
                 ln2 = f"{taxname}\t{avail_seq}\t{num_avail}\t{tid}\n"
                 out.write(ln2)
-                fname = f"{prefix}_{genus}_{species}_{gene}_sequences.fasta"
+                fname = f"{prefix}_{gene}_{taxname}_sp._seqs.fasta"
                 fasta = open(fname, "w")
                 fres = Entrez.efetch(db="nuccore", id=ids, rettype="fasta")
                 for seq_record in SeqIO.parse(fres, "fasta"):
                     name1 = str(seq_record.id)
-                    headstring = f"{name1} {genus} {species} taxid={tid}"
+                    headstring = f"{name1} {taxname} sp. taxid={tid}"
                     fasta_format_string = f">{headstring}\n%s\n" % seq_record.seq
                     fasta.write(fasta_format_string)
-                fasta.close()
-            else:
-                # taxid_list = list(set(val for dic in taxiddict for val in taxiddict.values()))
-                print("more than one taxid found in hits, removing species that are not matches")
-                # taxid_dict = collections.Counter(taxiddict)
-                # true_taxid = taxid_dict.most_common()
-                new_ids = list()
-                tid_term = f"{taxname}"
-                h4 = Entrez.esearch(db="taxonomy", term=tid_term)
-                r4 = Entrez.read(h4)
-                true_taxid = int(r4['IdList'][0])
-                #print("taxid_num is",true_taxid)
-                for id in taxiddict.keys():
-                    id2=taxiddict[id]
-                    #print(id2)
-                    if id2 == true_taxid:
-                        new_ids.append(id)
-                    else:
-                        h6 = Entrez.esummary(db="taxonomy", id=id2)
-                        r6 = Entrez.read(h6)
-                        taxgenus2 = str(r6[0]['ScientificName'])
-                        taxspecies2 = str(r6[0]['Species'])
-                        #print(taxgenus2)
-                        words = taxgenus2.split()
-                        if len(words) >= 2:
-                            first_two_words = words[0] + " " + words[1]
-                            #print(first_two_words)
-                        elif len(words) == 1:
-                            first_two_words = words[0]
-                        else:
-                            print("no taxonomic info provided, moving to ncbi lineage data.")
-                        taxname2=first_two_words
-                        #print(r6[0]['Rank'])
-                        if r6[0]['Rank'] == "subspecies":
-                            print("taxa's rank is subspecies. Checking if it is subspecies of correct species.")
-                            print(taxname2, "=", taxname)
-                            if taxname2 == taxname:
-                                new_ids.append(id)
-                                print("taxon is a subspecies of species in taxlist, including in reference database.")
-                ln2 = f"{taxname}\t{avail_seq}\t{num_avail}\t{true_taxid}\n"
+        else:
+            term_search = f"{taxname}[ORGN] AND ({gene_terms})"
+            results = Entrez.esearch(db="nuccore", term=term_search, retmax=20)
+            result = Entrez.read(results)
+            print("Doing taxon", x, "of", taxlen, "species is", genus, species, "NCBI returns", len(result['IdList'])," result(s) for", gene)
+            x += 1
+            if (int(result['Count'])) <= 0:
+                ln2 = f"{taxname}\tno\t0\tNA\n"
                 out.write(ln2)
-                fname = f"{prefix}_{genus}_{species}_{gene}_sequences.fasta"
-                fasta = open(fname, "w")
-                fres = Entrez.efetch(db="nuccore", id=new_ids, rettype="fasta")
-                for seq_record in SeqIO.parse(fres, "fasta"):
-                    name1 = str(seq_record.id)
-                    headstring = f"{name1} {genus} {species} taxid={true_taxid}"
-                    fasta_format_string = f">{headstring}\n%s\n" % seq_record.seq
-                    fasta.write(fasta_format_string)
-                fasta.close()
+            else:
+                genus_yes.append(genus)
+                avail_seq = "yes"
+                num_avail = int(result['Count'])
+                ids = result['IdList']
+                handle = Entrez.esummary(db="nuccore", id=ids, rettype="gb")
+                records = Entrez.read(handle)
+                #print(records)
+                for record in records:
+                    accession = record['Id']
+                    taxids = int(record['TaxId'])
+                    taxiddict.update({accession: taxids})
+                #print(len(list(set(list(taxiddict.values())))))
+                if len(list(set(list(taxiddict.values())))) == 1:
+                    tid = int(records[0]['TaxId'])
+                    ln2 = f"{taxname}\t{avail_seq}\t{num_avail}\t{tid}\n"
+                    out.write(ln2)
+                    fname = f"{prefix}_{genus}_{species}_{gene}_sequences.fasta"
+                    fasta = open(fname, "w")
+                    fres = Entrez.efetch(db="nuccore", id=ids, rettype="fasta")
+                    for seq_record in SeqIO.parse(fres, "fasta"):
+                        name1 = str(seq_record.id)
+                        headstring = f"{name1} {genus} {species} taxid={tid}"
+                        fasta_format_string = f">{headstring}\n%s\n" % seq_record.seq
+                        fasta.write(fasta_format_string)
+                    fasta.close()
+                else:
+                    # taxid_list = list(set(val for dic in taxiddict for val in taxiddict.values()))
+                    print("more than one taxid found in hits, removing species that are not matches")
+                    # taxid_dict = collections.Counter(taxiddict)
+                    # true_taxid = taxid_dict.most_common()
+                    new_ids = list()
+                    tid_term = f"{taxname}"
+                    h4 = Entrez.esearch(db="taxonomy", term=tid_term)
+                    r4 = Entrez.read(h4)
+                    true_taxid = int(r4['IdList'][0])
+                    #print("taxid_num is",true_taxid)
+                    for id in taxiddict.keys():
+                        id2=taxiddict[id]
+                        #print(id2)
+                        if id2 == true_taxid:
+                            new_ids.append(id)
+                        else:
+                            h6 = Entrez.esummary(db="taxonomy", id=id2)
+                            r6 = Entrez.read(h6)
+                            taxgenus2 = str(r6[0]['ScientificName'])
+                            taxspecies2 = str(r6[0]['Species'])
+                            #print(taxgenus2)
+                            words = taxgenus2.split()
+                            if len(words) >= 2:
+                                first_two_words = words[0] + " " + words[1]
+                                #print(first_two_words)
+                            elif len(words) == 1:
+                                first_two_words = words[0]
+                            else:
+                                print("no taxonomic info provided, moving to ncbi lineage data.")
+                            taxname2=first_two_words
+                            #print(r6[0]['Rank'])
+                            if r6[0]['Rank'] == "subspecies":
+                                print("taxa's rank is subspecies. Checking if it is subspecies of correct species.")
+                                print(taxname2, "=", taxname)
+                                if taxname2 == taxname:
+                                    new_ids.append(id)
+                                    print("taxon is a subspecies of species in taxlist, including in reference database.")
+                    ln2 = f"{taxname}\t{avail_seq}\t{num_avail}\t{true_taxid}\n"
+                    out.write(ln2)
+                    fname = f"{prefix}_{genus}_{species}_{gene}_sequences.fasta"
+                    fasta = open(fname, "w")
+                    fres = Entrez.efetch(db="nuccore", id=new_ids, rettype="fasta")
+                    for seq_record in SeqIO.parse(fres, "fasta"):
+                        name1 = str(seq_record.id)
+                        headstring = f"{name1} {genus} {species} taxid={true_taxid}"
+                        fasta_format_string = f">{headstring}\n%s\n" % seq_record.seq
+                        fasta.write(fasta_format_string)
+                    fasta.close()
     genus_yes2 = collections.Counter(genus_yes)
     genus_all2 = collections.Counter(genus_all)
     missing_genus = list()
