@@ -45,7 +45,7 @@ for gene in list_of_genes:
     x = 1
     taxlen = len(taxalist2.readlines())
     for line in taxalist:
-        delimiter_index = s.find(' ')
+        delimiter_index = line.find(' ')
         if delimiter_index == -1:
             taxname=line()
             taxiddict = {accession: id for key, value in []}
