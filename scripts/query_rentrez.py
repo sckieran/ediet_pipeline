@@ -47,9 +47,9 @@ for gene in list_of_genes:
     for line in taxalist:
         delimiter_index = line.find(' ')
         if delimiter_index == -1:
-            taxname=line()
+            taxname=line
             taxiddict = {accession: id for key, value in []}
-            genus=line()
+            genus=line
             species="sp."
             genus_all.append(genus)
         else:
