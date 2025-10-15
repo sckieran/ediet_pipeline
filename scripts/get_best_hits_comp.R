@@ -111,7 +111,7 @@ bbh_tax_r$class[bbh_tax_r$best_resolution=="phylum"] <- "Not Resolved"
 bbh_tax_r <- unique(bbh_tax_r)
 
 combo_taxa_table <- left_join(seq_table,bbh_full,by="seqnum")
-combo_taxa_table$best_hit[which(is.na(taxa_table$best_hit))] <- "No Hit"
+combo_taxa_table$best_hit[which(is.na(combo_taxa_table$best_hit))] <- "No Hit"
 names(combo_taxa_table)[names(combo_taxa_table) == 'best_hit'] <- 'best_hit_local'
 write_delim(local_taxa_table, paste0(args[4],"/",args[1],"_",args[2],"_full_combined_localremote_taxatable.txt"),delim="\t",quote="none")
 
