@@ -49,7 +49,7 @@ seq_table$seqnum <- gsub(">","",seq_table$seqnum)
 
 remote_taxa_table <- left_join(seq_table,bbh_r,by="seqnum")
 remote_taxa_table$best_hit_remote[which(is.na(remote_taxa_table$best_hit_remote))] <- "No Hit"
-write_delim(local_taxa_table, paste0(args[4],"/",args[1],"_",args[2],"_full_local_taxatable.txt"),delim="\t",quote="none")
+write_delim(remote_taxa_table, paste0(args[4],"/",args[1],"_",args[2],"_full_remote_taxatable.txt"),delim="\t",quote="none")
 
 bbh_tax_r <- unique(remote_taxa_table[,c(1,5,9:15)])
 bbh_tax_r$species[bbh_tax_r$best_resolution!="species"] <- "Not Resolved"
