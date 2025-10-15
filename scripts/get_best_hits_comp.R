@@ -130,4 +130,4 @@ remote_taxa_species_summary <- remote_taxa_table %>% group_by(best_hit_remote) %
 write_delim(remote_taxa_species_summary, paste0(args[4],"/",args[1],"_",args[2],"_remote_species_summary_taxatable.txt"),delim="\t",quote="none")
 
 asvs <- combo_taxa_table %>% group_by(sequence) %>% summarise(total_reads=sum(reads), num_samps=n_distinct(sample),best_hit_local=unique(best_hit_local),identity_local=unique(identity),best_hit_remote=unique(best_hit_remote),identity_remote=unique(identity_remote),best_resolution_local=unique(best_resolution),best_resolution_remote=unique(best_resolution_remote))
-write_delim(asvs, paste0(args[4],"/",args[1],"_",args[2],"_best_hit_comparison_by_asv.txt"),delim="\t",quote="none")
+write_delim(asvs, paste0(args[4],"/",args[1],"_",args[2],"_best_hit_comparison_by_asv_taxatable.txt"),delim="\t",quote="none")
